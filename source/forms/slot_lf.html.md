@@ -1,5 +1,5 @@
 ---
-title: Slot No.82 DiamondCats Message Protocols
+title: Slot No.85 LunarFortune Message Protocols
 
 language_tabs: # must be one of https://git.io/vQNgJ
   - json
@@ -14,7 +14,7 @@ includes:
 search: true
 ---
 
-# Slot No.82 DiamondCats 메시지 프로토콜 소개 문서
+# Slot No.85 LunarFortune 메시지 프로토콜 소개 문서
 
 이하 호출 프로토콜에서 기본으로 필요한 `SIG_SLOT protocol`은 설명에서 제외.
 
