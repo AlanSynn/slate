@@ -12,7 +12,7 @@ includes:
   - slot
 
 search: true
-print: true
+print: false
 ---
 
 # Slot No.82 DiamondCats 메시지 프로토콜 소개 문서
@@ -52,7 +52,26 @@ handle_signal: function( msg ) {
 ```
 
 > Response  
-> 상세사항은 Argument 탭 참조.
+> 상세사항은 Response Parameters 탭 참조.
+
+### Response Parameters
+
+Parameter | Default | Description
+--------- | ------- | -----------
+protocol | int(502) | SIG_SET_SLOT
+code | int(200) | 서버 OK 리스폰스 넘버
+gameID | int(0-max) | 슬롯 게임 아이디
+rid | int(0) | -1이면 슬롯이 아닌 경우
+gameInfo | object | 게임에 대한 정보가 담긴 Object
+betTable | Array | 파시트에서 정의된 betTable값
+betLimit | object Array | 서버에서 정의된 betting Limit 정보
+betIndex | int(-1-betTable마지막 인덱스) | 마지막으로 배팅한 배팅금액의 betTable에서의 인덱스
+betLines | int(1-max) or string(ex: `AllWays`) | 배팅라인수나 타입에 대한 정보
+betPerLine | int(1-max) | 라인별 배팅금액 정보
+parSheet | object | 파시트에 대한 정보들 중에 파시트에서 마지막단 "excludeForClient"를 뺀 나머지 정보
+maxLine | int(1-max) or string(ex: `AllWays`) | 슬롯에서의 최대 페이라인 갯수
+gameName | string | 슬롯의 이름
+gameParams | `null object` or object | 슬롯에서 별도로 정의한 게임에 필요한 정보 object, 없으면 null
 
 ```json
 {
