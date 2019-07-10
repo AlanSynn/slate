@@ -6,7 +6,7 @@ language_tabs: # must be one of https://git.io/vQNgJ
 
 toc_footers:
   - <a href='https://alansynn.com'>Documented by Alan Synn</a>
-  - Rev 1.0
+  - Rev 1.2
 
 includes:
   - slot
@@ -15,7 +15,7 @@ search: true
 ---
 
 # Slot No.85 LunarFortune 메시지 프로토콜 소개 문서
-### Rev 1.1
+### Rev 1.2
 이하 호출 프로토콜에서 기본으로 필요한 `SIG_SLOT protocol`은 설명에서 제외.
 
 ## 수정내역
@@ -28,6 +28,13 @@ search: true
 2019-06-19 11:55
 
 + PickGame Result 패킷에 프리스핀 횟수 추가
+
+### Rev 1.2
+2019-07-10 23:05
+
++ Claim Jackpot 추가
++ Phase Multiple(리프레시시 라벨 배수) 추가
++ 스핀 멈췄을때 다이렉트 페이 값 추가
 
 # 슬롯(룸) 입장
 
@@ -208,29 +215,33 @@ handle_signal: function( msg ) {
 
 ### Response Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-protocol | int(100) | SIG_SLOT_SPIN
-code | int(200) | 서버 OK 리스폰스 넘버
-rands | int(0-스트립길이) Array(3) | 랜드값
-isPickGame | boolean | 픽게임에 당첨되었는지 여부
-redOverlayArr | int(-1 or 1) Array(9) | 레드 오버레이 심볼 1d 어레이 1이면 있는것, -1이면 없는것 
-blueOverlayArr | int(-1 or 1) Array(9) | 블루 오버레이 심볼 1d 어레이 1이면 있는것, -1이면 없는것 
-redSymbolCount | int(0-max) | 현재(이번 스핀)까지 획득한 레드심볼 수
-blueSymbolCount | int(0-max) | 현재(이번 스핀)까지 획득한 블루심볼 수
-result | object Array | 획득 결과 내용
-totalWin | int(0-max) | 획득 결과 금액
-winInfo | object | 획득 정보에 대한 판정을 담은 객체
-winInfo.isMajorWin | boolean | 메이져 윈 여부
-winInfo.majorWinIndex | int(-1-4) | 메이져윈일 경우의 인덱스
-winInfo.multiple | int(0-max) | 당첨금액/총배팅액 결과
-winInfo.lineMultiple | int(0-max) | 당첨금액/라인배팅액 결과
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1|protocol | int(100) | SIG_SLOT_SPIN
+1|code | int(200) | 서버 OK 리스폰스 넘버
+1|rands | int(0-스트립길이) Array(3) | 랜드값
+1|isPickGame | boolean | 픽게임에 당첨되었는지 여부
+1.2|directPayInfo | int(-1-max) | 스핀 결과때 다이렉트 페이 심볼에 띄워줄 금액(row 기준)
+1|redOverlayArr | int(-1 or 1) Array(9) | 레드 오버레이 심볼 1d 어레이 1이면 있는것, -1이면 없는것(row 기준)
+1|blueOverlayArr | int(-1 or 1) Array(9) | 블루 오버레이 심볼 1d 어레이 1이면 있는것, -1이면 없는것(row 기준)
+1.2|redSymbolCount | int(0-max) | 현재(이번 스핀)까지 획득한 레드심볼 수
+1.2|blueSymbolCount | int(0-max) | 현재(이번 스핀)까지 획득한 블루심볼 수
+1.2|redSymbolCountArr | int(8-max) Array(배팅인덱스 수) | 레드 심볼 카운트를 배팅금액 당 저장한 어레이
+1.2|blueSymbolCountArr | int(5-max) Array(배팅인덱스 수) | 블루 심볼 카운트를 배팅금액 당 저장한 어레이
+1|result | object Array | 획득 결과 내용
+1|totalWin | int(0-max) | 획득 결과 금액
+1|winInfo | object | 획득 정보에 대한 판정을 담은 객체
+1|winInfo.isMajorWin | boolean | 메이져 윈 여부
+1|winInfo.majorWinIndex | int(-1-4) | 메이져윈일 경우의 인덱스
+1|winInfo.multiple | int(0-max) | 당첨금액/총배팅액 결과
+1|winInfo.lineMultiple | int(0-max) | 당첨금액/라인배팅액 결과
 
 ### Response Parameters in DEBUG
 
 Parameter | Default | Description
 --------- | ------- | -----------
-DEBUG_FOR_CLIENT_GRID | int Array(9) | 랜드한 심볼 이름
+DEBUG_FOR_CLIENT_GRID | int Array(9) | 랜드한 심볼 이름(row 기준)
+DEBUG_FOR_CLIENT_GRID_RANDS | int Array(9) | 랜드값(row 기준)
 
 > Request  
 Spin 요청
@@ -254,10 +265,13 @@ handle_signal: function( msg ) {
     "code": 200,
     "rands": [15,23,19],
     "isPickGame": false,
+    "directPayInfo": [-1,450,-1,-1,-1,-1,-1,-1,-1],
     "redOverlayArr": [1,-1,-1,-1,-1,-1,-1,-1,-1],
     "blueOverlayArr": [-1,-1,1,-1,-1,-1,-1,-1,-1],
-    "redSymbolCount": 6,
-    "blueSymbolCount": 1,
+    "redSymbolCount" : 8,
+    "blueSymbolCount" : 5,
+    "redSymbolCountArr" : [8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8],
+    "blueSymbolCountArr" : [5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],
     "result": [],
     "totalWin": 0,
     "winInfo": {
@@ -282,7 +296,8 @@ handle_signal: function( msg ) {
             "Wild01",
             "NoSymbol"
         ]
-    ]
+    ],
+    "DEBUG_FOR_CLIENT_GRID_RANDS" : [[71,71,71],[52,21,44],[71,71,71]]
 } 
 ```
 
@@ -295,15 +310,23 @@ handle_signal: function( msg ) {
 
 ### Response Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
-action | int(0) | 파시트에서 받아온 상수
-code | int(200) | 서버 OK 리스폰스 넘버
-isRed | boolean | 레드 링크에 당첨되었는지 여부
-isBlue | boolean | 블루 링크에 당첨되었는지 여부
-freeSpinCount | int(1-max) | 프리스핀 횟수(ex: 8(최소 프리스핀횟수, 기본값) + 각 게임(red, blue)을 위해 획득한 심볼갯수)
-result | int(-1 or 1) Array(3) | 0번 인덱스가 유저가 고른 결과, 나머지는 셔플된 결과. 1이면 Red Link이고 -1 이면 Blue Link
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+1|action | int(1) | 파시트에서 받아온 상수
+1|code | int(200) | 서버 OK 리스폰스 넘버
+1|isRed | boolean | 레드 링크에 당첨되었는지 여부
+1|isBlue | boolean | 블루 링크에 당첨되었는지 여부
+1|freeSpinCount | int(1-max) | 프리스핀 횟수(ex: 8(최소 프리스핀횟수, 기본값) + 각 게임(red, blue)을 위해 획득한 심볼갯수)
+1|result | int(-1 or 1) Array(3) | 0번 인덱스가 유저가 고른 결과, 나머지는 셔플된 결과. 1이면 Red Link이고 -1 이면 Blue Link
+1.2|isLinkMode | boolean | 링크스핀 진입 신호
+1.2|randIds | int Array(9 or 18) | 랜드한 심볼의 아이디
+1.2|initRands | int Array(9 or 18) | 링크스핀 씬에서 시작전에 보여줄 설정용 랜드값
+1.2|winOnLock | int Array(9 or 18) | 현재 랜딩한 페이 심볼의 금액값
+1.2|directPayOnLock | int Array(9 or 18) | 현재 랜딩한 다이렉트 페이 심볼의 금액값
+1.2|shuffledReelIdx | int Array(9 or 18) | 순서를 섞은 릴 인덱스
+1.2|lockedReel | int Array(9 or 18) | 락이 걸려있는 릴 들의 배열(-1이면 lock이 안걸린것, 나머지 양수면 lock걸린 릴의 랜드값)
+1.2|eachWin | int | 현재 표시할 EachWin 금액
 
 > Request  
 Spin 요청
@@ -332,8 +355,15 @@ handle_signal: function( msg ) {
     "isRed": true,
     "isBlue": false,
     "freeSpinCount": 8,
-    "result": [1,-1,-1],
-    
+    "result":[-1,1,-1],
+    "isLinkMode":true,
+    "randIds":[71,51,71,71,42,71,71,54,71],
+    "initRands":[0,11,0,6,3,10,0,15,0],
+    "winOnLock":[0,90,0,0,9000,0,0,225,0],
+    "directPayOnLock":[-1,90,-1,-1,-1,-1,-1,225,-1],
+    "shuffledReelIdx":[0,1,4,2,8,3,6,5,7],
+    "lockedReel":[-1,11,-1,-1,3,-1,-1,15,-1],
+    "eachWin":208352
 }
 ```
 
@@ -347,23 +377,32 @@ handle_signal: function( msg ) {
 
 ### Response Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
-action | int(1) | 파시트에서 받아온 상수
-code | int(200) | 서버 OK 리스폰스 넘버
-rands | int Array(9) | 그리드 전체의 랜드값
-blueLinkSpinCount | int(0-100) | 남은 블루링크 스핀수
-totalWin | int(0-max) | 획득 금액
-jackpot | boolean | 잭팟 여부
-jackpotWin | int(0-max) | 잭팟으로 획득한 금액 
-directWin | int(0-max) | 다이렉트페이로 획득한 금액
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+1|action | int(3) | 파시트에서 받아온 상수
+1|code | int(200) | 서버 OK 리스폰스 넘버
+1.2|shuffledRandArr | int Array(9) | 섞여진 릴들의 랜드값
+1.2|shuffledRandsExceptLock | int Array(9) | -1이면 락이 걸린것, 나머지 숫자는 락이 걸린 랜드값
+1.2|shuffledRandIds | int Array(9) | 랜드한 아이디 값들
+1.2|currWinOnLock|int Array(9) | 각 심볼들에 걸린 금액
+1.2|eachWin | int(0-max) | 현재 eachWin 값
+1.2|viewTotalWin | int(0-max) | 현재보여줄 totalWin 값(리프레시의 경우 달라짐)
+1.2|linkSpinTotalWin | int(0-max) | 링크스핀 전체의 획득 금액
+1.2|initFreeSpinCount | int(0-max) | 링크스핀 진입 횟수
+1.2|blueLinkSpinCount | int(0-max) | 남은 링크스핀 횟수
+1.2|redSymbolCountArr | int(8-max) Array(배팅인덱스 수) | 레드 심볼 카운트를 배팅금액 당 저장한 어레이
+1.2|blueSymbolCountArr | int(5-max) Array(배팅인덱스 수) | 블루 심볼 카운트를 배팅금액 당 저장한 어레이
+1|jackpot | boolean | 잭팟 여부
+1.2|phaseMultiple | int | 다음번 리프레시에서 전체 다이렉트 페이 심볼에 곱할 배수
+1.2|isRefresh | boolean | 페이즈 변경 여부(리프레시)
+1.2|shuffledReelIdx | int Array(9) | 순서를 섞은 릴 인덱스
+1.2|lockedReel | int Array(9) | 락이 걸려있는 릴 들의 배열(-1이면 lock이 안걸린것, 나머지 양수면 lock걸린 릴의 랜드값)
 
 ### Response Parameters in DEBUG
 
 Parameter | Default | Description
 --------- | ------- | -----------
-DEBUG_FOR_CLIENT_SYMBOL_NUM_ARR | int Array(9) | 랜드한 심볼 ID값
 DEBUG_FOR_CLIENT_SYMBOL_INFO_ARR | string Array(9) | 랜드한 심볼 이름
 
 > Request  
@@ -389,15 +428,24 @@ handle_signal: function( msg ) {
     "protocol": 120,
     "action": 1,
     "code": 200,
-    "rands": [14,10,10,9,0,10,11,11,10],
-    "blueLinkSpinCount": 3,
-    "totalWin": 0,
-    "jackpot": false,
-    "jackpotWin": 0,
-    "directWin": 0,
-    "DEBUG_FOR_CLIENT_SYMBOL_NUM_ARR": [54,51,51,21,41,51,22,22,51],
-    "DEBUG_FOR_CLIENT_SYMBOL_INFO_ARR": ["Direct","Direct","Direct","Bar03","GrandJackpot","Direct","Bar02","Bar02","Direct"]
-} 
+    "shuffledRandArr":[7,15,9,15,1,3,1,15,1],
+    "shuffledRandsExceptLock":[-1,-1,-1,-1,-1,3,-1,-1,-1],
+    "shuffledRandIds":[44,54,50,54,41,42,41,54,41],
+    "currWinOnLock":[721,225,45,225,90000,9001,90000,225,90000],
+    "eachWin":280442,
+    "viewTotalWin":280442,
+    "linkSpinTotalWin":280442,
+    "initFreeSpinCount":5,
+    "blueLinkSpinCount":2,
+    "redSymbolCountArr":[8,8,9,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8],
+    "blueSymbolCountArr":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],
+    "jackpot":true,
+    "phaseMultiple":1.2,
+    "isRefresh":true,
+    "shuffledReelIdx":[2,5,1,3,6,8,0,7,4],
+    "lockedReel":[-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    "DEBUG_FOR_CLIENT_SYMBOL_INFO_ARR":[44,54,50,54,41,42,41,54,41]
+}
 ```
 
 > Error Response
@@ -409,23 +457,32 @@ handle_signal: function( msg ) {
 
 ### Response Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
-action | int(2) | 파시트에서 받아온 상수
-code | int(200) | 서버 OK 리스폰스 넘버
-rands | int Array(18) | 그리드 전체의 랜드값
-redLinkSpinCount | int(0-100) | 남은 레드링크 스핀수
-totalWin | int(0-max) | 얻은 금액
-jackpot | boolean | 잭팟 여부
-jackpotWin | int(0-max) | 잭팟으로 얻은 금액 
-directWin | int(0-max) | 다이렉트페이로 얻은 금액
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+1|action | int(2) | 파시트에서 받아온 상수
+1|code | int(200) | 서버 OK 리스폰스 넘버
+1.2|shuffledRandArr | int Array(18) | 섞여진 릴들의 랜드값
+1.2|shuffledRandsExceptLock | int Array(18) | -1이면 락이 걸린것, 나머지 숫자는 락이 걸린 랜드값
+1.2|shuffledRandIds | int Array(18) | 랜드한 아이디 값들
+1.2|currWinOnLock|int Array(18) | 각 심볼들에 걸린 금액
+1.2|eachWin | int(0-max) | 현재 eachWin 값
+1.2|viewTotalWin | int(0-max) | 현재보여줄 totalWin 값(리프레시의 경우 달라짐)
+1.2|linkSpinTotalWin | int(0-max) | 링크스핀 전체의 획득 금액
+1.2|initFreeSpinCount | int(0-max) | 링크스핀 진입 횟수
+1.2|redLinkSpinCount | int(0-max) | 남은 링크스핀 횟수
+1.2|redSymbolCountArr | int(8-max) Array(배팅인덱스 수) | 레드 심볼 카운트를 배팅금액 당 저장한 어레이
+1.2|blueSymbolCountArr | int(5-max) Array(배팅인덱스 수) | 블루 심볼 카운트를 배팅금액 당 저장한 어레이
+1|jackpot | boolean | 잭팟 여부
+1.2|phaseMultiple | int | 다음번 리프레시에서 전체 다이렉트 페이 심볼에 곱할 배수
+1.2|isRefresh | boolean | 페이즈 변경 여부(리프레시)
+1.2|shuffledReelIdx | int Array(18) | 순서를 섞은 릴 인덱스
+1.2|lockedReel | int Array(18) | 락이 걸려있는 릴 들의 배열(-1이면 lock이 안걸린것, 나머지 양수면 lock걸린 릴의 랜드값)
 
 ### Response Parameters in DEBUG
 
 Parameter | Default | Description
 --------- | ------- | -----------
-DEBUG_FOR_CLIENT_SYMBOL_NUM_ARR | int Array(18) | 랜드한 심볼 ID값
 DEBUG_FOR_CLIENT_SYMBOL_INFO_ARR | string Array(18) | 랜드한 심볼 이름
 
 > Request  
@@ -451,15 +508,187 @@ handle_signal: function( msg ) {
     "protocol": 120,
     "action": 2,
     "code": 200,
-    "rands": [1,14,13,15,12,0,8,13,11,13,1,12,0,3,8,7,14,9],
-    "redLinkSpinCount": 3,
-    "totalWin": 0,
-    "jackpot": false,
-    "jackpotWin": 0,
-    "directWin": 0,
-    "DEBUG_FOR_CLIENT_SYMBOL_NUM_ARR": [1,54,23,11,52,41,50,23,22,23,1,52,41,2,50,13,54,21],
-    "DEBUG_FOR_CLIENT_SYMBOL_INFO_ARR": ["Wild01","Direct","Bar01","Gold","Direct","GrandJackpot","Direct","Bar01","Bar02","Bar01","Wild01","Direct","GrandJackpot","Wild02","Direct","Seven","Direct","Bar03"]
-} 
+    "shuffledRandArr":[7,17,13,7,17,14,11,7,5,9,13,18,9,13,5,18,17,1],
+    "shuffledRandsExceptLock":[-1,-1,-1,-1,-1,14,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    "shuffledRandIds":[44,53,52,44,53,23,51,44,43,50,52,99,50,52,43,99,53,41],
+    "currWinOnLock":[720,180,135,720,180,0,90,720,1800,45,135,376785,45,135,1800,377865,180,90000],
+    "eachWin":468000,
+    "viewTotalWin":1022490,
+    "linkSpinTotalWin":1874025,
+    "initFreeSpinCount":8,
+    "redLinkSpinCount":1,
+    "redSymbolCountArr":[8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8],
+    "blueSymbolCountArr":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],
+    "jackpot":false,
+    "phaseMultiple":1.2,
+    "isRefresh":false,
+    "shuffledReelIdx":[11,14,6,2,8,9,1,7,4,13,17,15,0,3,10,12,5,16],
+    "lockedReel":[7,17,13,7,17,-1,11,7,5,9,13,18,9,13,5,18,17,1],
+    "DEBUG_FOR_CLIENT_SYMBOL_INFO_ARR":[44,53,52,44,53,23,51,44,43,50,52,99,50,52,43,99,53,41]
+}
+```
+
+> Error Response
+
+```json
+```
+
+## Claim Link Spin Total Win
+Rev 1.2에서 추가  
+링크스핀 끝날때 요청
+
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1.2|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+1.2|action | int(4) | 파시트에서 받아온 상수
+1.2|code | int(200) | 서버 OK 리스폰스 넘버
+1.2|linkSpinTotalWin | int(0-max) | 링크스핀 전체의 획득 금액
+1.2|initFreeSpinCount | int(0-max) | 링크스핀 진입 횟수
+1.2|redSymbolCount | int(0-max) | 현재(이번 스핀)까지 획득한 레드심볼 수
+1.2|blueSymbolCount | int(0-max) | 현재(이번 스핀)까지 획득한 블루심볼 수
+1.2|redSymbolCountArr | int(8-max) Array(배팅인덱스 수) | 레드 심볼 카운트를 배팅금액 당 저장한 어레이
+1.2|blueSymbolCountArr | int(5-max) Array(배팅인덱스 수) | 블루 심볼 카운트를 배팅금액 당 저장한 어레이
+1.2|betIndex | int(0-max) | Bet 금액 인덱스
+
+> Request  
+
+```javascript
+// Define Pick Game Signal From parSheet
+var SIG.CLAIM_LINK_SPIN_TOTAL_WIN = this.parSheet.actions.claimResultWin;
+
+// Signal Handler on Client side
+handle_signal: function( msg ) {
+        switch( msg.protocol ) {
+            case SIG.CLAIM_LINK_SPIN_TOTAL_WIN: {
+                ...
+            }
+                break;
+            ...
+```
+
+> Response
+
+```json
+{
+    "protocol": 120,
+    "action": 3,
+    "code":200,
+    "linkSpinTotalWin":1005165,
+    "initFreeSpinCount":8,
+    "blueSymbolCount":6,
+    "redSymbolCount":8,
+    "redSymbolCountArr":[8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8],
+    "blueSymbolCountArr":[5,5,6,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],
+    "betIndex":2
+}
+```
+
+> Error Response
+
+```json
+```
+
+## Claim Phase Change
+Rev 1.2에서 추가  
+페이즈 변할때 요청
+
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1.2|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+1.2|action | int(5) | 파시트에서 받아온 상수
+1.2|code | int(200) | 서버 OK 리스폰스 넘버
+1.2|betCash | int(0-max) | 배팅 금액
+1.2|phaseChangeJackpotInfo | int(0-max) Array(4) | 페이즈 체인지할때의 잭팟 인포 배열
+1.2|phaseMultiple | int | 리프레시에서 전체 다이렉트 페이 심볼에 곱할 배수
+
+> Request  
+
+```javascript
+// Define Pick Game Signal From parSheet
+var SIG.CLAIM_PHASE_CHANGE = this.parSheet.actions.claimPhaseChange;
+
+// Signal Handler on Client side
+handle_signal: function( msg ) {
+        switch( msg.protocol ) {
+            case SIG.CLAIM_PHASE_CHANGE: {
+                ...
+            }
+                break;
+            ...
+```
+
+> Response
+
+```json
+{
+    "protocol": 120,
+    "action": 4,
+    "code":200,
+    "betCash":90,
+    "phaseChangeJackpotInfo":[720,1800,9000,90000],
+    "phaseMultiple":1
+}
+```
+
+> Error Response
+
+```json
+```
+
+## Claim Phase Change
+Rev 1.2에서 추가  
+페이즈 변할때 인덱스를 담아서 요청
+
+### Request Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1.2|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1.2|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+1.2|action | int(6) | 파시트에서 받아온 상수
+1.2|code | int(200) | 서버 OK 리스폰스 넘버
+1.2|jackpotType | string | `Minor`, `Minor`, `Minor`, `Minor` 중에 하나
+1.2|betCash | int(0-max) | 배팅 금액
+1.2|jackpotInfo | int(0-max) Array(4) | 새로운 잭팟 인포 배열
+1.2|phaseMultiple | int | 리프레시에서 전체 다이렉트 페이 심볼에 곱할 배수
+
+> Request  
+
+```javascript
+// Define Pick Game Signal From parSheet
+var SIG.CLAIM_JACKPOT = this.parSheet.actions.claimJackpot;
+
+// Signal Handler on Client side
+handle_signal: function( msg ) {
+        switch( msg.protocol ) {
+            case SIG.CLAIM_JACKPOT: {
+                ...
+            }
+                break;
+            ...
+```
+
+> Response
+
+```json
+{
+    "protocol": 120,
+    "action": 6,
+    "code":200,
+    "jackpotType": "Minor",
+    "betCash":90,
+    "jackpotInfo":[720,1800,9000,90000],
+    "phaseMultiple":1
+}
 ```
 
 > Error Response
@@ -477,7 +706,9 @@ Slot No.85 LunarFortune
 
 Code | Meaning | Argument
 ---------- | ------- | -------
-0 | Pick Game | None
-1 | blueLinkSpin | None
-2 | redLinkSpin | None
-3 | claimResultWin | grid(1d array) index 
+1 | Pick Game | None
+2 | blueLinkSpin | None
+3 | redLinkSpin | None
+4 | claimResultWin | grid(1d array) index 
+5 | claimPhaseChange | None
+6 | claimJackpot | index(int)

@@ -1,38 +1,40 @@
 ---
-title: Slot No.82 DiamondCats Message Protocols
+title: Slot No.85 LunarFortune Message Protocols
 
 language_tabs: # must be one of https://git.io/vQNgJ
   - json
 
 toc_footers:
   - <a href='https://alansynn.com'>Documented by Alan Synn</a>
-  - Rev 1.1
+  - Rev 1.2
 
 includes:
   - slot
 
 search: true
-print: false
 ---
 
-# Slot No.82 DiamondCats 메시지 프로토콜 소개 문서
-작성자 : 신동주 전임
-
-### Rev 1.1
+# Slot No.85 LunarFortune 메시지 프로토콜 소개 문서
+### Rev 1.2
 이하 호출 프로토콜에서 기본으로 필요한 `SIG_SLOT protocol`은 설명에서 제외.
 
 ## 수정내역
 ### Rev 1
-2019-06-19 13:00 
+2019-06-12 18:00 
 
-+ 기본스핀, 휠게임
++ 기본사항
 
 ### Rev 1.1
-2019-06-19 13:00 
+2019-06-19 11:55
 
-+ 휠게임 결과에 `nextStrip` 추가
-+ 스핀피쳐(`freeSpin`, `diamondSpin`, `superDiamondSpin`) 추가
-+ 잭팟 안내(`Response on Jackpot`) 추가
++ PickGame Result 패킷에 프리스핀 횟수 추가
+
+### Rev 1.2
+2019-07-10 23:05
+
++ Claim Jackpot 추가
++ Phase Multiple(리프레시시 라벨 배수) 추가
++ 스핀 멈췄을때 다이렉트 페이 값 추가
 
 # 슬롯(룸) 입장
 
@@ -52,93 +54,154 @@ handle_signal: function( msg ) {
 ```
 
 > Response  
-> 상세사항은 Response Parameters 탭 참조.
-
-### Response Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-protocol | int(502) | SIG_SET_SLOT
-code | int(200) | 서버 OK 리스폰스 넘버
-gameID | int(0-max) | 슬롯 게임 아이디
-rid | int(0) | -1이면 슬롯이 아닌 경우
-gameInfo | object | 게임에 대한 정보가 담긴 Object
-betTable | Array | 파시트에서 정의된 betTable값
-betLimit | object Array | 서버에서 정의된 betting Limit 정보
-betIndex | int(-1-betTable마지막 인덱스) | 마지막으로 배팅한 배팅금액의 betTable에서의 인덱스
-betLines | int(1-max) or string(ex: `AllWays`) | 배팅라인수나 타입에 대한 정보
-betPerLine | int(1-max) | 라인별 배팅금액 정보
-parSheet | object | 파시트에 대한 정보들 중에 파시트에서 마지막단 "excludeForClient"를 뺀 나머지 정보
-maxLine | int(1-max) or string(ex: `AllWays`) | 슬롯에서의 최대 페이라인 갯수
-gameName | string | 슬롯의 이름
-gameParams | `null object` or object | 슬롯에서 별도로 정의한 게임에 필요한 정보 object, 없으면 null
+> 상대적으로 긴 정보는 ... 으로 표시. 상세사항은 Argument 탭 참조.
 
 ```json
 {
     "code": 200,
-    "gameID": 82,
+    "gameID": 85,
     "rid": 0,
     "gameInfo": {
         "betTable": [ 2, 5, 10, 25, 50, 75, 60000 ],
         "betLimit": [ { "level": 2, "bet": 20000 }, { "level": 6, "bet": 40000 }, { "level": 9, "bet": 80000 } ],
         "betIndex": -1,
-        "betLines": 50,
+        "betLines": 9,
         "betPerLine": 10,
         "parSheet": {
             "TEST_MODE": false,
-            "payLines": ["0x00000","0x11111","0x22222","0x33333","0x00100","0x33233","0x01010","0x32323","0x01110","0x32223","0x01210","0x32123","0x10001","0x23332","0x10101","0x23232","0x11011","0x22322","0x11211","0x22122","0x12121","0x21212","0x12221","0x21112","0x12321","0x21012","0x00123","0x33210","0x01001","0x32332","0x01123","0x32210","0x01232","0x32101","0x10012","0x23321","0x10123","0x23210","0x11012","0x22321","0x11233","0x22100","0x12100","0x21233","0x12210","0x21123","0x12333","0x21000","0x01233","0x32100"],
-            "betTable": [2,5,10,25,50,75,60000],
+            "betTable": [ 100, 200, 500, 1000, 2000, 4000, 8000, 20000, 40000, 80000, 200000, 400000, 800000, 2000000, 4000000, 8000000, 20000000, 40000000 ],
+            "payLines": [ "0x111", "0x000", "0x222", "0x012", "0x210", "0x101", "0x121", "0x212", "0x010" ],
             "symbols": [
-                {"id":90,"type":0,"extraNum":10,"typifyName":"dcSymScatter_WheelAR"},
-                {"id":1,"type":0,"extraNum":10,"typifyName":"dcSymWildAR"},
-                {"id":11,"type":0,"extraNum":10,"typifyName":"dcSymMajor01_RedAR"},
-                {"id":12,"type":0,"extraNum":10,"typifyName":"dcSymMajor02_PurpleAR"},
-                {"id":13,"type":0,"extraNum":10,"typifyName":"dcSymMajor03_BlueAR"},
-                {"id":14,"type":0,"extraNum":10,"typifyName":"dcSymMajor04_GreenAR"},
-                {"id":15,"type":0,"extraNum":10,"typifyName":"dcSymMajor05_RingAR"},
-                {"id":16,"type":0,"extraNum":10,"typifyName":"dcSymMajor06_CushionAR"},
-                {"id":21,"type":0,"extraNum":10,"typifyName":"dcSymMinor01_SpadeAR"},
-                {"id":22,"type":0,"extraNum":10,"typifyName":"dcSymMinor02_HeartAR"},
-                {"id":23,"type":0,"extraNum":10,"typifyName":"dcSymMinor03_CloverAR"},
-                {"id":24,"type":0,"extraNum":10,"typifyName":"dcSymMinor04_DiamondAR"}
+                { "id": 71, "name": "NoSymbol", "type": 0, "typifyName": "lfSymEmptyAR" },
+                { "id": 11, "name": "Gold", "type": 0, "typifyName": "lfSymMajor01_GoldAR" },
+                { "id": 1, "name": "Wild01", "type": 0, "typifyName": "lfSymWild02_x1AR" },
+                { "id": 2, "name": "Wild02", "type": 0, "typifyName": "lfSymWild01_x2AR" },
+                { "id": 41, "name": "GrandJackpot", "type": 0, "typifyName": "lfSymScatter01_GrandAR" },
+                { "id": 42, "name": "MegaJackpot", "type": 0, "typifyName": "lfSymScatter01_MegaAR" },
+                { "id": 43, "name": "MajorJackpot", "type": 0, "typifyName": "lfSymScatter01_MajorAR" },
+                { "id": 44, "name": "MinorJackpot", "type": 0, "typifyName": "lfSymScatter01_MinorAR" },
+                { "id": 50, "name": "Direct", "type": 0, "typifyName": "lfSymScatter02_DirectpayAR", "value": 0.5 },
+                { "id": 51, "name": "Direct", "type": 0, "typifyName": "lfSymScatter02_DirectpayAR", "value": 1 },
+                { "id": 52, "name": "Direct", "type": 0, "typifyName": "lfSymScatter02_DirectpayAR", "value": 1.5 },
+                { "id": 53, "name": "Direct", "type": 0, "typifyName": "lfSymScatter02_DirectpayAR", "value": 2 },
+                { "id": 54, "name": "Direct", "type": 0, "typifyName": "lfSymScatter02_DirectpayAR", "value": 2.5 },
+                { "id": 13, "name": "Seven", "type": 0, "typifyName": "lfSymMajor03_7AR" },
+                { "id": 12, "name": "SevenSevenSeven", "type": 0, "typifyName": "lfSymMajor02_777AR" },
+                { "id": 21, "name": "Bar03", "type": 0, "typifyName": "lfSymMinor01_3barAR" },
+                { "id": 22, "name": "Bar02", "type": 0, "typifyName": "lfSymMinor02_2barAR" },
+                { "id": 23, "name": "Bar01", "type": 0, "typifyName": "lfSymMinor03_1barAR" }
             ],
-            "wildReelWheel": {
-                "strip":["W1","W13","W123","W15","W24","W25","W45","W2345"]
-            },
-            "reelArrayWheel": {
-                "strip":["R2","R3","R2","R3","R2","R4","R3","R4"]
-            },
-            "freeSpinWheel": {
-                "strip":[11,9,11,9,11,9,2,9]
-            },
-            "superWheel": {
-                "strip":["EF1","EF2","EF3","EF4","EF5","EF6","EF7","EF8"]
-            },
-            "superPotBetLimit":50000,
-            "jackpot": {
-                "totalBetLimit":[50000]
-            },
-            "actions": {
-                "catWheelGame": 0,
-                "diamondWheelGame": 1,
-                "superDiamondWheelGame": 2,
-                "freeSpinGame": 3,
-                "diamondSpinGame": 4,
-                "superDiamondSpinGame": 5
-            },
-            "nextStrip": [
-                [13,13,13,13,13,13,13,13,13,13,13,13,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-                [13,13,13,13,13,13,13,13,13,13,13,13,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-                [13,13,13,13,13,13,13,13,13,13,13,13,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-                [13,13,13,13,13,13,13,13,13,13,13,13,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-                [13,13,13,13,13,13,13,13,13,13,13,13,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14]
-            ]
+            "linkSymbols": [
+                { "id": 99, "name": "Lunar", "type": 0, "typifyName": "lfSymScatter03_LunarLinkAR" },
+                { "id": 11, "name": "Gold", "type": 0, "typifyName": "lfSymMajor01_Gold_LinkAR" },
+                { "id": 1, "name": "Wild01", "type": 0, "typifyName": "lfSymWild02_x1_LinkAR" },
+                { "id": 2, "name": "Wild02", "type": 0, "typifyName": "lfSymWild01_x2_LinkAR" },
+                { "id": 41, "name": "GrandJackpot", "type": 0, "typifyName": "lfSymScatter01_Grand_LinkAR" },
+                { "id": 42, "name": "MegaJackpot", "type": 0, "typifyName": "lfSymScatter01_Mega_LinkAR" },
+                { "id": 43, "name": "MajorJackpot", "type": 0, "typifyName": "lfSymScatter01_Major_LinkAR" },
+                { "id": 44, "name": "MinorJackpot", "type": 0, "typifyName": "lfSymScatter01_Minor_LinkAR" },
+                { "id": 50, "name": "Direct", "type": 0, "typifyName": "lfSymScatter02_DirectpayLinkAR", "value": 0.5 },
+                { "id": 51, "name": "Direct", "type": 0, "typifyName": "lfSymScatter02_Directpay_linkAR", "value": 1 },
+                { "id": 52, "name": "Direct", "type": 0, "typifyName": "lfSymScatter02_Directpay_linkAR", "value": 1.5 },
+                { "id": 53, "name": "Direct", "type": 0, "typifyName": "lfSymScatter02_Directpay_linkAR", "value": 2 },
+                { "id": 54, "name": "Direct", "type": 0, "typifyName": "lfSymScatter02_Directpay_linkAR", "value": 2.5 },
+                { "id": 13, "name": "Seven", "type": 0, "typifyName": "lfSymMajor03_7_linkAR" },
+                { "id": 12, "name": "SevenSevenSeven", "type": 0, "typifyName": "lfSymMajor02_777_LinkAR" },
+                { "id": 21, "name": "Bar03", "type": 0, "typifyName": "lfSymMinor01_3bar_LinkAR" },
+                { "id": 22, "name": "Bar02", "type": 0, "typifyName": "lfSymMinor02_2bar_LinkAR" },
+                { "id": 23, "name": "Bar01", "type": 0, "typifyName": "lfSymMinor03_1bar_LinkAR" }
+            ],
+            "reels": [
+                {
+                    "index": 0,
+                    "strip": [ 71, 41, 71, 42, 71, 43, 71, 44, 71, 50, 71, 51, 71, 52, 71, 53, 71, 54, 71, 1, 71, 2, 71, 11, 71, 12, 71, 13, 71, 21, 71, 22, 71, 23 ]
+                },
+                {
+                    "index": 1,
+                    "strip": [ 71, 41, 71, 42, 71, 43, 71, 44, 71, 50, 71, 51, 71, 52, 71, 53, 71, 54, 71, 1, 71, 2, 71, 11, 71, 12, 71, 13, 71, 21, 71, 22, 71, 23 ]
+                },
+                {
+                    "index": 2,
+                    "strip": [ 71, 41, 71, 42, 71, 43, 71, 44, 71, 50, 71, 51, 71, 52, 71, 53, 71, 54, 71, 1, 71, 2, 71, 11, 71, 12, 71, 13, 71, 21, 71, 22, 71, 23 ]
+                }
+            ],
+            "blueLinkReels": [
+                {
+                    "index": 0,
+                    "strip": [ 41, 1, 42, 2, 43, 12, 44, 13, 50, 21, 51, 22, 52, 23, 54, 11, 13 ]
+                },
+                {
+                    "index": 1,
+                    "strip": [ 41, 1, 42, 2, 43, 12, 44, 13, 50, 21, 51, 22, 52, 23, 54, 11, 13 ]
+                },
+                {
+                    "index": 2,
+                    "strip": [ 41, 1, 42, 2, 43, 12, 44, 13, 50, 21, 51, 22, 52, 23, 54, 11, 13 ]
+                },
+                {
+                    "index": 3,
+                    "strip": [ 41, 1, 42, 2, 43, 12, 44, 13, 50, 21, 51, 22, 52, 23, 54, 11, 13 ]
+                },
+                {
+                    "index": 4,
+                    "strip": [ 41, 1, 42, 2, 43, 12, 44, 13, 50, 21, 51, 22, 52, 23, 54, 11, 13 ]
+                },
+                {
+                    "index": 5,
+                    "strip": [ 41, 1, 42, 2, 43, 12, 44, 13, 50, 21, 51, 22, 52, 23, 54, 11, 13 ]
+                },
+                {
+                    "index": 6,
+                    "strip": [ 41, 1, 42, 2, 43, 12, 44, 13, 50, 21, 51, 22, 52, 23, 54, 11, 13 ]
+                },
+                {
+                    "index": 7,
+                    "strip": [ 41, 1, 42, 2, 43, 12, 44, 13, 50, 21, 51, 22, 52, 23, 54, 11, 13 ]
+                },
+                {
+                    "index": 8,
+                    "strip": [ 41, 1, 42, 2, 43, 12, 44, 13, 50, 21, 51, 22, 52, 23, 54, 11, 13 ]
+                }
+            ],
+            "redLinkReels": [
+                {
+                    "index": 0,
+                    "strip": [ 41, 1, 42, 2, 43, 12, 44, 13, 50, 21, 51, 22, 52, 23, 54, 11, 13 ]
+                },
+                {
+                    "index": 1,
+                    "strip": [ 41, 1, 42, 2, 43, 12, 44, 13, 50, 21, 51, 22, 52, 23, 54, 11, 13 ]
+                },
+                {
+                    "index": 2,
+                    "strip": [ 41, 1, 42, 2, 43, 12, 44, 13, 50, 21, 51, 22, 52, 23, 54, 11, 13 ]
+                },
+                {
+                    "index": 3,
+                    "strip": [ 41, 1, 42, 2, 43, 12, 44, 13, 50, 21, 51, 22, 52, 23, 54, 11, 13 ]
+                }, ...총 18개 (index : 0 - 17)
+            ],
+            "highBalanceFreeSpinProb": [ 0.98, 0.96, 0.76, 0.5 ],
+            "x1WildSymbolID": 1,
+            "x2WildSymbolID": 2,
+            "wildSymbolIDs": [ 1, 2 ],
+            "wildMultiply": [ 1, 2 ],
+            "linkTriggerSymbolIDs": [ 41, 42, 43, 44, 50, 51, 52, 53, 54 ],
+            "majorSymbolIDs": [ 11, 12, 13, 21, 22, 23 ],
+            "scatterSymbolIDs": [ 31, 41 ],
+            "linkSymbolIDs": [ 99, 54, 53, 52, 51, 50, 44, 43, 42, 41, 11 ],
+            "lunarSymbolID": 99,
+            "goldSymbolID": 11,
+            "linkJackpotSymbolIDs": [ 44, 43, 42, 41 ],
+            "linkDirectSymbolIDs": [ 54, 53, 52, 51, 50 ],
+            "noSymbolID": 71,
+            "actions": { "pickGame": 0, "blueLinkSpin": 1, "redLinkSpin": 2, "claimResultWin": 3 }
         },
-        "maxLine": 50
+        "maxLine": 9
     },
-    "gameName": "diamondCats",
+    "gameName": "lunarFortune",
     "gameParams": null
-} 
+}
 ```
 
 > Error Response
@@ -152,25 +215,33 @@ gameParams | `null object` or object | 슬롯에서 별도로 정의한 게임�
 
 ### Response Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-protocol | int(100) | SIG_SLOT_SPIN
-code | int(200) | 서버 OK 리스폰스 넘버
-rands | int(0-스트립길이) Array(5) | 랜드값
-result | object Array | 획득 결과 내용(잭팟일때는 `Response on Jackpot` 참조)
-totalWin | int(0-max) | 획득한 총 금액(result의 합산)
-isCatWheel | boolean | 캣휠피쳐(스캐터 3개)에 당첨되었는지 여부
-nextStrip | int Array(스트립길이x5) | 다음번 스핀시 돌릴 스트립들
-totalPotCount | int(0-200) | 현재까지 팟이 차오른 크기(팟이 터질시 0으로 초기화)
-potStep | int(0-5) | 팟스텝, 몇번째 팟인지 여부(마지막 즉, 5번째라도 배팅금액이 일정금액 미만일시 isSuperPot이 아닌 isPot이 true가 되어 다이아몬드팟 피쳐로 진입)
-isPot | boolean | 다이아몬드 팟 피쳐에 당첨되었는지 여부
-isSuperPot | boolean | 슈퍼 다이아몬드 팟 피쳐에 당첨되었는지 여부
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1|protocol | int(100) | SIG_SLOT_SPIN
+1|code | int(200) | 서버 OK 리스폰스 넘버
+1|rands | int(0-스트립길이) Array(3) | 랜드값
+1|isPickGame | boolean | 픽게임에 당첨되었는지 여부
+1.2|directPayInfo | int(-1-max) | 스핀 결과때 다이렉트 페이 심볼에 띄워줄 금액(row 기준)
+1|redOverlayArr | int(-1 or 1) Array(9) | 레드 오버레이 심볼 1d 어레이 1이면 있는것, -1이면 없는것(row 기준)
+1|blueOverlayArr | int(-1 or 1) Array(9) | 블루 오버레이 심볼 1d 어레이 1이면 있는것, -1이면 없는것(row 기준)
+1.2|redSymbolCount | int(0-max) | 현재(이번 스핀)까지 획득한 레드심볼 수
+1.2|blueSymbolCount | int(0-max) | 현재(이번 스핀)까지 획득한 블루심볼 수
+1.2|redSymbolCountArr | int(8-max) Array(배팅인덱스 수) | 레드 심볼 카운트를 배팅금액 당 저장한 어레이
+1.2|blueSymbolCountArr | int(5-max) Array(배팅인덱스 수) | 블루 심볼 카운트를 배팅금액 당 저장한 어레이
+1|result | object Array | 획득 결과 내용
+1|totalWin | int(0-max) | 획득 결과 금액
+1|winInfo | object | 획득 정보에 대한 판정을 담은 객체
+1|winInfo.isMajorWin | boolean | 메이져 윈 여부
+1|winInfo.majorWinIndex | int(-1-4) | 메이져윈일 경우의 인덱스
+1|winInfo.multiple | int(0-max) | 당첨금액/총배팅액 결과
+1|winInfo.lineMultiple | int(0-max) | 당첨금액/라인배팅액 결과
 
 ### Response Parameters in DEBUG
 
 Parameter | Default | Description
 --------- | ------- | -----------
-DEBUG_FOR_CLIENT_GRID | int Array(5x4) | 랜드한 그리드 결과
+DEBUG_FOR_CLIENT_GRID | int Array(9) | 랜드한 심볼 이름(row 기준)
+DEBUG_FOR_CLIENT_GRID_RANDS | int Array(9) | 랜드값(row 기준)
 
 > Request  
 Spin 요청
@@ -192,593 +263,107 @@ handle_signal: function( msg ) {
  {
     "protocol": 100,
     "code": 200,
-    "rands":[36,17,10,49,0],
-    "result":[
-        {"win":120000,"matchSymbolID":16,"name":"CushionMajor","matchCount":3,"lineIndex":24,"wildCount":2},
-        {"win":120000,"matchSymbolID":16,"name":"CushionMajor","matchCount":3,"lineIndex":46,"wildCount":2}
-    ],
-    "totalWin":240000,
-    "isCatWheel":false,
-    "DEBUG_FOR_CLIENT_GRID":[
-        [90,14,21,1,14],[1,15,21,11,21],[11,16,21,12,21],[12,21,1,13,21]
-    ],
-    "nextStrip":[
-        [24,24,24,90,90,90,90,90,24,24,24,24,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [24,24,24,90,90,90,90,90,24,24,24,24,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [24,24,24,90,90,90,90,90,24,24,24,24,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [24,24,24,90,90,90,90,90,24,24,24,24,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [24,24,24,90,90,90,90,90,24,24,24,24,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14]
-    ],
-    "totalPotCount":6,
-    "potStep":1,
-    "isPot":false,
-    "isSuperPot":false
-}
-```
-
-> Response on Jackpot
-
-```json
- {
-    "protocol": 100,
-    "code": 200,
-    "rands":[20,17,11,49,0],
-    "result":[
-        {"win":80000,"name":"Jackpot","matchSymbolID":1,"matchCount":50,"wildCount":50}
-    ],
-    "totalWin":240000,
-    "isCatWheel":false,
-    "DEBUG_FOR_CLIENT_GRID":[
-        [1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1]
-    ],
-    "nextStrip":[
-        [24,24,24,90,90,90,90,90,24,24,24,24,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [24,24,24,90,90,90,90,90,24,24,24,24,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [24,24,24,90,90,90,90,90,24,24,24,24,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [24,24,24,90,90,90,90,90,24,24,24,24,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [24,24,24,90,90,90,90,90,24,24,24,24,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14]
-    ],
-    "totalPotCount":6,
-    "potStep":1,
-    "isPot":false,
-    "isSuperPot":false
-}
-```
-
-> Error Response
-
-```json
-```
-
-## Cat Wheel Game
-
-총 `2`번의 Request를 서버로 보냄.
-1. 릴어레이 갯수 요청
-2. 와일드릴의 갯수 요청 -> 모든 결과를 보냄
-
-> Request (1-2번 모두 동일)    
-
-```javascript
-// Define Signal From parSheet
-var SIG.CAT_WHEEL_GAME_SIGNAL = this.parSheet.actions.catWheelGame;
-
-// Signal Handler on Client side
-handle_signal: function( msg ) {
-        switch( msg.protocol ) {
-            case SIG.CAT_WHEEL_GAME_SIGNAL: {
-                ...
-            }
-                break;
-            ...
-```
-
-### 공통 Response Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
-action | int(0) | 파시트에서 받아온 상수
-code | int(200) | 서버 OK 리스폰스 넘버
-nextStep | int(-1 or 1) | 남은 휠게임 스텝의 리퀘스트 인덱스 넘버(-1이면 휠게임의 종료)
-
-### 1번 Response Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-rand | int(0-7) | 캣휠 릴 어레이 스트립의 랜드값
-result | string | 캣휠 릴 어레이 스트립의 결과값
-
-> 1번 Response
-
-```json
-{
-    "protocol": 120,
-    "action": 0,
-    "code": 200,
-    "nextStep":1,
-    "rand":2,
-    "result":"R2"
-}
-```
-
-> Error Response
-
-```json
-```
-
-### 2번 Response Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-result | object | 캣휠 게임의 결과값이 들어있는 오브젝트
-wheelStep1 | string | 캣휠 릴 어레이 스트립의 랜드값
-wheelStep2 | string | 캣휠 와일드 릴 스트립의 랜드값
-clientSetting | object | 클라이언트 세팅을 위한 파싱 결과가 담긴 오브젝트
-reelArray | int(1-4) | (클라이언트에서) 세팅해야할 캣휠 릴 어레이 갯수
-wildReels | int Array(0-5) | (클라이언트에서) 세팅해야할 와일드 스트립(와일드로 가득찬) 인덱스( 0이면 첫번째, 4이면 5번째 릴 )
-remainSpinCount | int(1-max) | (클라이언트에서) 세팅해야할 프리스핀 횟수
-nextStrip | int Array(스트립길이x5) | 다음번 프리스핀시 돌릴 스트립들
-
-> 2번 Response
-
-```json
-{
-    "protocol": 120,
-    "action": 0,
-    "code": 200,
-    "nextStep":-1,
-    "rand":3,
-    "result": {
-        "wheelStep1":"R2",
-        "wheelShep2":"W15",
-        "clientSetting": {
-            "reelArray":2,
-            "wildReels":[0,4]
-        },
-        "remainSpinCount":5,
-        "nextStrip":[
-            [11,11,11,11,11,11,11,11,11,11,11,11,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-            [11,11,11,11,11,11,11,11,11,11,11,11,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-            [11,11,11,11,11,11,11,11,11,11,11,11,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-            [11,11,11,11,11,11,11,11,11,11,11,11,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-            [11,11,11,11,11,11,11,11,11,11,11,11,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14]
-        ]
-    }
-}
-```
-
-> Error Response
-
-```json
-```
-
-## Diamond Wheel Game
-
-총 `3`번의 Request를 서버로 보냄.
-1. 프리스핀 횟수 요청
-2. 릴어레이 갯수 요청
-3. 와일드릴의 갯수 요청 -> 모든 결과를 보냄
-
-### 공통 Response Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
-action | int(1) | 파시트에서 받아온 상수
-code | int(200) | 서버 OK 리스폰스 넘버
-nextStep | int(-1 or 1-2) | 남은 휠게임 스텝의 리퀘스트 인덱스 넘버(-1이면 휠게임의 종료)
-
-> Request (1-3번 모두 동일)    
-
-```javascript
-// Define Signal From parSheet
-var SIG.DIAMOND_WHEEL_GAME_SIGNAL = this.parSheet.actions.diamondWheelGame;
-
-// Signal Handler on Client side
-handle_signal: function( msg ) {
-        switch( msg.protocol ) {
-            case SIG.DIAMOND_WHEEL_GAME_SIGNAL: {
-                ...
-            }
-                break;
-            ...
-```
-
-> Error Response
-
-```json
-```
-
-### 1번 Response Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-rand | int(0-7) | 다이아몬드 프리스핀휠 스트립의 랜드값
-result | int(1-30) | 다이아몬드 프리스핀휠 스트립의 결과값
-
-> 1번 Response
-
-```json
-{
-    "protocol": 120,
-    "action": 1,
-    "code": 200,
-    "nextStep":1,
-    "rand":4,
-    "result":11
-}
-```
-
-> Error Response
-
-```json
-```
-
-### 2번 Response Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-rand | int(0-7) | 다이아몬드 릴 어레이 휠의 랜드값
-result | string | 다이아몬드 릴 어레이 휠의 결과값
-
-> 2번 Response
-
-```json
-{
-    "protocol": 120,
-    "action": 1,
-    "code": 200,
-    "nextStep":2,
-    "rand":5,
-    "result":"R4"
-}
-```
-
-> Error Response
-
-```json
-```
-
-### 3번 Response Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-rand | int(0-7) | 다이아몬드휠 와일드 릴 스트립의 랜드값
-result | object | 다이아몬드휠 게임의 결과값이 들어있는 오브젝트
-wheelStep1 | string | 다이아몬드휠 릴 어레이 스트립의 결과값
-wheelStep2 | string | 다이아몬드휠 와일드 릴 스트립의 결과값
-clientSetting | object | 클라이언트 세팅을 위한 파싱 결과가 담긴 오브젝트
-reelArray | int(1-4) | (클라이언트에서) 세팅해야할 캣휠 릴 어레이 갯수
-wildReels | int Array(0-5) | (클라이언트에서) 세팅해야할 와일드 스트립(와일드로 가득찬) 인덱스( 0이면 첫번째, 4이면 5번째 릴 )
-remainSpinCount | int(1-max) | (클라이언트에서) 세팅해야할 프리스핀 횟수
-nextStrip | int Array(스트립길이x5) | 다음번 다이아몬드스핀시 돌릴 스트립들(모든 릴 어레이 공통)
-
-> 3번 Response
-
-```json
-{
-    "protocol": 120,
-    "action": 1,
-    "code": 200,
-    "nextStep":-1,
-    "rand":3,
-    "result":{
-        "wheelStep1":"R4",
-        "wheelStep2":"W15",
-        "clientSetting":{
-            "reelArray":4,
-            "wildReels":[0,4]
-        },
-        "remainSpinCount":11,
-        "nextStrip":[
-            [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-            [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-            [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-            [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-            [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14]
-        ]
-    }
-}
-```
-
-> Error Response
-
-```json
-```
-
-## Super Diamond Wheel Game
-
-총 `4`번의 Request를 서버로 보냄.
-1. 프리스핀휠에 더해질 횟수 어레이 요청
-2. 프리스핀 횟수 요청
-3. 릴어레이 갯수 요청
-4. 와일드릴의 갯수 요청 -> 모든 결과를 보냄
-
-### 공통 Response Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
-action | int(2) | 파시트에서 받아온 상수
-code | int(200) | 서버 OK 리스폰스 넘버
-nextStep | int(-1 or 1-3) | 남은 휠게임 스텝의 리퀘스트 인덱스 넘버(-1이면 휠게임의 종료)
-
-> Request (1-4번 모두 동일)    
-
-```javascript
-// Define Signal From parSheet
-var SIG.SUPER_DIAMOND_WHEEL_GAME_SIGNAL = this.parSheet.actions.superDiamondWheelGame;
-
-// Signal Handler on Client side
-handle_signal: function( msg ) {
-        switch( msg.protocol ) {
-            case SIG.SUPER_DIAMOND_WHEEL_GAME_SIGNAL: {
-                ...
-            }
-                break;
-            ...
-```
-
-> Error Response
-
-```json
-```
-
-### 1번 Response Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-rand | int(0-7) | 슈퍼다이아몬드 프리스핀휠에 더해질 횟수의 랜드값(클라이언트에서 안쓰임)
-result | int Array(8) | 슈퍼다이아몬드 프리스핀휠 Wedge에 각각 더해질 횟수들이 들어있는 결과 Array
-
-> 1번 Response
-
-```json
-{
-    "protocol": 120,
-    "action": 2,
-    "code": 200,
-    "nextStep":1,
-    "rand":0,
-    "result":[0,0,0,0,0,0,0,1]
-}
-```
-
-> Error Response
-
-```json
-```
-
-### 2번 Response Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-rand | int(0-7) | 슈퍼다이아몬드 프리스핀휠 스트립의 랜드값
-result | int(1-30) | 슈퍼다이아몬드 프리스핀휠 스트립의 결과값
-
-> 2번 Response
-
-```json
-{
-    "protocol": 120,
-    "action": 2,
-    "code": 200,
-    "nextStep":2,
-    "rand":4,
-    "result":11
-}
-```
-
-> Error Response
-
-```json
-```
-
-### 3번 Response Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-rand | int(0-7) | 슈퍼다이아몬드 릴 어레이 휠의 랜드값
-result | string | 슈퍼다이아몬드 릴 어레이 휠의 결과값
-
-> 3번 Response
-
-```json
-{
-    "protocol": 120,
-    "action": 2,
-    "code": 200,
-    "nextStep":2,
-    "rand":0,
-    "result":"R2"
-}
-```
-
-> Error Response
-
-```json
-```
-
-### 4번 Response Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-rand | int(0-7) | 슈퍼다이아몬드 와일드 릴 스트립의 랜드값
-result | object | 슈퍼다이아몬드휠 게임의 결과값이 들어있는 오브젝트
-wheelStep1 | string | 슈퍼다이아몬드휠 릴 어레이 스트립의 결과값
-wheelStep2 | string | 슈퍼다이아몬드휠 릴 어레이 스트립의 결과값
-wheelStep3 | string | 슈퍼다이아몬드휠 와일드 릴 스트립의 결과값
-clientSetting | object | 클라이언트 세팅을 위한 파싱 결과가 담긴 오브젝트
-reelArray | int(1-4) | (클라이언트에서) 세팅해야할 캣휠 릴 어레이 갯수
-wildReels | int Array(0-5) | (클라이언트에서) 세팅해야할 와일드 스트립(와일드로 가득찬) 인덱스( 0이면 첫번째, 4이면 5번째 릴 )
-remainSpinCount | int(1-max) | (클라이언트에서) 세팅해야할 프리스핀 횟수
-nextStrip | int Array(스트립길이x5) | 다음번 슈퍼다이아몬드스핀시 돌릴 스트립들(모든 릴 어레이 공통)
-
-> 4번 Response
-
-```json
-{
-    "protocol": 120,
-    "action": 2,
-    "code": 200,
-    "nextStep":-1,
-    "rand":1,
-    "result":{
-        "wheelStep1":[0,0,0,0,0,0,0,1],
-        "wheelStep2":"R2",
-        "wheelStep3":"W13",
-        "clientSetting":{
-            "reelArray":2,
-            "wildReels":[0,2]
-        },
-        "remainSpinCount":11,
-        "nextStrip":[
-            [21,21,21,21,21,21,21,21,21,21,21,21,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-            [21,21,21,21,21,21,21,21,21,21,21,21,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-            [21,21,21,21,21,21,21,21,21,21,21,21,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-            [21,21,21,21,21,21,21,21,21,21,21,21,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-            [21,21,21,21,21,21,21,21,21,21,21,21,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14]
-        ]
-    }
-}
-```
-
-> Error Response
-
-```json
-```
-
-## FreeSpin
-`Cat Wheel Game` 결과를 기반으로 프리스핀 진행
-
-<aside class="success">
-Remember — `FreeSpin`, `Diamond Spin`, `Super Diamond Spin`은 기본적으로 같은 구조의 리스폰스를 보냄
-</aside>
-
-> Request      
-
-```javascript
-// Define Signal From parSheet
-var SIG.FREESPIN_GAME_SIGNAL = this.parSheet.actions.freeSpinGame;
-
-// Signal Handler on Client side
-handle_signal: function( msg ) {
-        switch( msg.protocol ) {
-            case SIG.FREESPIN_GAME_SIGNAL: {
-                ...
-            }
-                break;
-            ...
-```
-
-### Response Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
-action | int(3) | 파시트에서 받아온 상수
-code | int(200) | 서버 OK 리스폰스 넘버
-rands | int Array(5x릴어레이갯수) | 릴어레이 갯수 만큼의 랜드값
-result | object Array(당첨항목수x릴어레이갯수) | 각 릴어레이의 획득 결과 내용이 담긴 어레이
-reelArrayWins | int Array(릴어레이갯수) | 릴 어레이별로 획득한 총 금액(result의 합산)
-reelArrayJackpots | boolean | 릴 어레이별 잭팟 당첨 여부
-freeSpinTotalWin | 프리스핀 중의 총 획득 금액
-remainSpinCount | 현재 남은 스핀 횟수
-wildReelIdxArr | int Array(1-4) | 캣휠피쳐에서 당첨된 와일드로 가득찬(잠긴) 어레이의 인덱스가 담긴 배열(ex: `[0]`이면 각 릴 어레이의 1번째 릴이 와일드로 잠김)
-nextStrip | int Array(스트립길이x5) | 다음번 스핀시 돌릴 스트립들
-
-### Response Parameters in DEBUG
-
-Parameter | Default | Description
---------- | ------- | -----------
-DEBUG_FOR_CLIENT_GRID | int Array(5x4) Array(릴어레이갯수) | 랜드한 그리드 결과
-
-> Response
-
-```json
-{
-    "protocol": 120,
-    "action": 3,
-    "code": 200,
-    "rands":[[3,29,19,3,21],[14,18,24,52,22]],
-    "result":[
-        [],
+    "rands": [15,23,19],
+    "isPickGame": false,
+    "directPayInfo": [-1,450,-1,-1,-1,-1,-1,-1,-1],
+    "redOverlayArr": [1,-1,-1,-1,-1,-1,-1,-1,-1],
+    "blueOverlayArr": [-1,-1,1,-1,-1,-1,-1,-1,-1],
+    "redSymbolCount" : 8,
+    "blueSymbolCount" : 5,
+    "redSymbolCountArr" : [8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8],
+    "blueSymbolCountArr" : [5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],
+    "result": [],
+    "totalWin": 0,
+    "winInfo": {
+        "isMajorWin": false,
+        "majorWinIndex": -1,
+        "multiple": 0,
+        "lineMultiple": 0
+    },
+    "DEBUG_FOR_CLIENT_GRID": [
         [
-            {"win":4,"matchSymbolID":16,"name":"CushionMajor","matchCount":3,"lineIndex":1,"wildCount":2},
-            {"win":4,"matchSymbolID":15,"name":"RingMajor","matchCount":3,"lineIndex":4,"wildCount":2},
-            {"win":4,"matchSymbolID":16,"name":"CushionMajor","matchCount":3,"lineIndex":8,"wildCount":2},
-            {"win":4,"matchSymbolID":21,"name":"SpadeMinor","matchCount":3,"lineIndex":11,"wildCount":3},
-            {"win":4,"matchSymbolID":15,"name":"RingMajor","matchCount":3,"lineIndex":14,"wildCount":2},
-            {"win":4,"matchSymbolID":21,"name":"SpadeMinor","matchCount":3,"lineIndex":19,"wildCount":2},
-            {"win":4,"matchSymbolID":21,"name":"SpadeMinor","matchCount":3,"lineIndex":20,"wildCount":2},
-            {"win":4,"matchSymbolID":16,"name":"CushionMajor","matchCount":3,"lineIndex":23,"wildCount":2},
-            {"win":4,"matchSymbolID":15,"name":"RingMajor","matchCount":3,"lineIndex":26,"wildCount":3},
-            {"win":4,"matchSymbolID":16,"name":"CushionMajor","matchCount":3,"lineIndex":30,"wildCount":3},
-            {"win":4,"matchSymbolID":21,"name":"SpadeMinor","matchCount":3,"lineIndex":33,"wildCount":2},
-            {"win":4,"matchSymbolID":15,"name":"RingMajor","matchCount":3,"lineIndex":36,"wildCount":3},
-            {"win":4,"matchSymbolID":21,"name":"SpadeMinor","matchCount":3,"lineIndex":41,"wildCount":2},
-            {"win":4,"matchSymbolID":21,"name":"SpadeMinor","matchCount":3,"lineIndex":42,"wildCount":2},
-            {"win":4,"matchSymbolID":16,"name":"CushionMajor","matchCount":3,"lineIndex":45,"wildCount":3},
-            {"win":4,"matchSymbolID":21,"name":"SpadeMinor","matchCount":3,"lineIndex":49,"wildCount":2}
-        ]
-    ],
-    "reelArrayWins":[0,64],
-    "reelArrayJackpots":[false,false],
-    "freeSpinTotalWin":426,
-    "remainSpinCount":3,
-    "wildReelIdxArr":[0],
-    "nextStrip":[
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14]
-    ],
-    "DEBUG_FOR_CLIENT_GRID":[
-        [
-            [1,15,90,13,23],[1,16,1,14,24],[1,21,11,12,90],[1,22,12,12,1]
-        ],[
-            [1,15,90,13,23],[1,16,1,14,24],[1,21,11,12,90],[1,22,12,12,1]
-        ]
-    ]
-}
-```
-
-> Response on Jackpot
-
-```json
-{
-    "protocol": 120,
-    "action": 3,
-    "code": 200,
-    "rands":[[3,13,19,22,21],[14,18,42,32,22]],
-    "result":[
-        [
-            {"win":80000,"name":"Jackpot","matchSymbolID":1,"matchCount":50,"wildCount":50}
+            "NoSymbol",
+            "Direct",
+            "NoSymbol"
         ],
         [
-            {"win":80000,"name":"Jackpot","matchSymbolID":1,"matchCount":50,"wildCount":50}
-        ]
-    ],
-    "reelArrayWins":[80000,80000],
-    "reelArrayJackpots":[true,true],
-    "freeSpinTotalWin":160000,
-    "remainSpinCount":5,
-    "wildReelIdxArr":[0],
-    "nextStrip":[
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14]
-    ],
-    "DEBUG_FOR_CLIENT_GRID":[
+            "NoSymbol",
+            "Gold",
+            "NoSymbol"
+        ],
         [
-            [1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1]
-        ],[
-            [1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1]
+            "NoSymbol",
+            "Wild01",
+            "NoSymbol"
         ]
-    ]
+    ],
+    "DEBUG_FOR_CLIENT_GRID_RANDS" : [[71,71,71],[52,21,44],[71,71,71]]
+} 
+```
+
+> Error Response
+
+```json
+```
+
+## Pick Game
+
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+1|action | int(1) | 파시트에서 받아온 상수
+1|code | int(200) | 서버 OK 리스폰스 넘버
+1|isRed | boolean | 레드 링크에 당첨되었는지 여부
+1|isBlue | boolean | 블루 링크에 당첨되었는지 여부
+1|freeSpinCount | int(1-max) | 프리스핀 횟수(ex: 8(최소 프리스핀횟수, 기본값) + 각 게임(red, blue)을 위해 획득한 심볼갯수)
+1|result | int(-1 or 1) Array(3) | 0번 인덱스가 유저가 고른 결과, 나머지는 셔플된 결과. 1이면 Red Link이고 -1 이면 Blue Link
+1.2|isLinkMode | boolean | 링크스핀 진입 신호
+1.2|randIds | int Array(9 or 18) | 랜드한 심볼의 아이디
+1.2|initRands | int Array(9 or 18) | 링크스핀 씬에서 시작전에 보여줄 설정용 랜드값
+1.2|winOnLock | int Array(9 or 18) | 현재 랜딩한 페이 심볼의 금액값
+1.2|directPayOnLock | int Array(9 or 18) | 현재 랜딩한 다이렉트 페이 심볼의 금액값
+1.2|shuffledReelIdx | int Array(9 or 18) | 순서를 섞은 릴 인덱스
+1.2|lockedReel | int Array(9 or 18) | 락이 걸려있는 릴 들의 배열(-1이면 lock이 안걸린것, 나머지 양수면 lock걸린 릴의 랜드값)
+1.2|eachWin | int | 현재 표시할 EachWin 금액
+
+> Request  
+Spin 요청
+
+```javascript
+// Define Pick Game Signal From parSheet
+var SIG.PICK_GAME_SIGNAL = this.parSheet.actions.pickGame;
+
+// Signal Handler on Client side
+handle_signal: function( msg ) {
+        switch( msg.protocol ) {
+            case SIG.PICK_GAME_SIGNAL: {
+                ...
+            }
+                break;
+            ...
+```
+
+> Response
+
+```json
+{
+    "protocol": 120,
+    "action": 0,
+    "code": 200,
+    "isRed": true,
+    "isBlue": false,
+    "freeSpinCount": 8,
+    "result":[-1,1,-1],
+    "isLinkMode":true,
+    "randIds":[71,51,71,71,42,71,71,54,71],
+    "initRands":[0,11,0,6,3,10,0,15,0],
+    "winOnLock":[0,90,0,0,9000,0,0,225,0],
+    "directPayOnLock":[-1,90,-1,-1,-1,-1,-1,225,-1],
+    "shuffledReelIdx":[0,1,4,2,8,3,6,5,7],
+    "lockedReel":[-1,11,-1,-1,3,-1,-1,15,-1],
+    "eachWin":208352
 }
 ```
 
@@ -787,137 +372,265 @@ DEBUG_FOR_CLIENT_GRID | int Array(5x4) Array(릴어레이갯수) | 랜드한 그
 ```json
 ```
 
-## Diamond Spin
-`Diamond Wheel Game` 결과를 기반으로 프리스핀 진행
 
-<aside class="success">
-Remember — `FreeSpin`, `Diamond Spin`, `Super Diamond Spin`은 기본적으로 같은 구조의 리스폰스를 보냄
-</aside>
+## Blue Link Game
 
-> Request      
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+1|action | int(3) | 파시트에서 받아온 상수
+1|code | int(200) | 서버 OK 리스폰스 넘버
+1.2|shuffledRandArr | int Array(9) | 섞여진 릴들의 랜드값
+1.2|shuffledRandsExceptLock | int Array(9) | -1이면 락이 걸린것, 나머지 숫자는 락이 걸린 랜드값
+1.2|shuffledRandIds | int Array(9) | 랜드한 아이디 값들
+1.2|currWinOnLock|int Array(9) | 각 심볼들에 걸린 금액
+1.2|eachWin | int(0-max) | 현재 eachWin 값
+1.2|viewTotalWin | int(0-max) | 현재보여줄 totalWin 값(리프레시의 경우 달라짐)
+1.2|linkSpinTotalWin | int(0-max) | 링크스핀 전체의 획득 금액
+1.2|initFreeSpinCount | int(0-max) | 링크스핀 진입 횟수
+1.2|blueLinkSpinCount | int(0-max) | 남은 링크스핀 횟수
+1.2|redSymbolCountArr | int(8-max) Array(배팅인덱스 수) | 레드 심볼 카운트를 배팅금액 당 저장한 어레이
+1.2|blueSymbolCountArr | int(5-max) Array(배팅인덱스 수) | 블루 심볼 카운트를 배팅금액 당 저장한 어레이
+1|jackpot | boolean | 잭팟 여부
+1.2|phaseMultiple | int | 다음번 리프레시에서 전체 다이렉트 페이 심볼에 곱할 배수
+1.2|isRefresh | boolean | 페이즈 변경 여부(리프레시)
+1.2|shuffledReelIdx | int Array(9) | 순서를 섞은 릴 인덱스
+1.2|lockedReel | int Array(9) | 락이 걸려있는 릴 들의 배열(-1이면 lock이 안걸린것, 나머지 양수면 lock걸린 릴의 랜드값)
+
+### Response Parameters in DEBUG
+
+Parameter | Default | Description
+--------- | ------- | -----------
+DEBUG_FOR_CLIENT_SYMBOL_INFO_ARR | string Array(9) | 랜드한 심볼 이름
+
+> Request  
 
 ```javascript
-// Define Signal From parSheet
-var SIG.DIAMOND_SPIN_GAME_SIGNAL = this.parSheet.actions.diamondSpinGame;
+// Define Pick Game Signal From parSheet
+var SIG.BLUE_LINK_GAME = this.parSheet.actions.blueLinkSpin;
 
 // Signal Handler on Client side
 handle_signal: function( msg ) {
         switch( msg.protocol ) {
-            case SIG.DIAMOND_SPIN_GAME_SIGNAL: {
+            case SIG.BLUE_LINK_GAME: {
                 ...
             }
                 break;
             ...
 ```
 
+> Response
+
+```json
+{
+    "protocol": 120,
+    "action": 1,
+    "code": 200,
+    "shuffledRandArr":[7,15,9,15,1,3,1,15,1],
+    "shuffledRandsExceptLock":[-1,-1,-1,-1,-1,3,-1,-1,-1],
+    "shuffledRandIds":[44,54,50,54,41,42,41,54,41],
+    "currWinOnLock":[721,225,45,225,90000,9001,90000,225,90000],
+    "eachWin":280442,
+    "viewTotalWin":280442,
+    "linkSpinTotalWin":280442,
+    "initFreeSpinCount":5,
+    "blueLinkSpinCount":2,
+    "redSymbolCountArr":[8,8,9,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8],
+    "blueSymbolCountArr":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],
+    "jackpot":true,
+    "phaseMultiple":1.2,
+    "isRefresh":true,
+    "shuffledReelIdx":[2,5,1,3,6,8,0,7,4],
+    "lockedReel":[-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    "DEBUG_FOR_CLIENT_SYMBOL_INFO_ARR":[44,54,50,54,41,42,41,54,41]
+}
+```
+
+> Error Response
+
+```json
+```
+
+## Red Link Game
+
 ### Response Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
-action | int(4) | 파시트에서 받아온 상수
-code | int(200) | 서버 OK 리스폰스 넘버
-rands | int Array(5x릴어레이갯수) | 릴어레이 갯수 만큼의 랜드값
-result | object Array(당첨항목수x릴어레이갯수) | 각 릴어레이의 획득 결과 내용이 담긴 어레이
-reelArrayWins | int Array(릴어레이갯수) | 릴 어레이별로 획득한 총 금액(result의 합산)
-reelArrayJackpots | boolean | 릴 어레이별 잭팟 당첨 여부
-freeSpinTotalWin | 프리스핀 중의 총 획득 금액
-remainSpinCount | 현재 남은 스핀 횟수
-wildReelIdxArr | int Array(1-4) | 다이아몬드휠피쳐에서 당첨된 와일드로 가득찬(잠긴) 어레이의 인덱스가 담긴 배열(ex: `[0]`이면 각 릴 어레이의 1번째 릴이 와일드로 잠김)
-nextStrip | int Array(스트립길이x5) | 다음번 스핀시 돌릴 스트립들
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+1|action | int(2) | 파시트에서 받아온 상수
+1|code | int(200) | 서버 OK 리스폰스 넘버
+1.2|shuffledRandArr | int Array(18) | 섞여진 릴들의 랜드값
+1.2|shuffledRandsExceptLock | int Array(18) | -1이면 락이 걸린것, 나머지 숫자는 락이 걸린 랜드값
+1.2|shuffledRandIds | int Array(18) | 랜드한 아이디 값들
+1.2|currWinOnLock|int Array(18) | 각 심볼들에 걸린 금액
+1.2|eachWin | int(0-max) | 현재 eachWin 값
+1.2|viewTotalWin | int(0-max) | 현재보여줄 totalWin 값(리프레시의 경우 달라짐)
+1.2|linkSpinTotalWin | int(0-max) | 링크스핀 전체의 획득 금액
+1.2|initFreeSpinCount | int(0-max) | 링크스핀 진입 횟수
+1.2|redLinkSpinCount | int(0-max) | 남은 링크스핀 횟수
+1.2|redSymbolCountArr | int(8-max) Array(배팅인덱스 수) | 레드 심볼 카운트를 배팅금액 당 저장한 어레이
+1.2|blueSymbolCountArr | int(5-max) Array(배팅인덱스 수) | 블루 심볼 카운트를 배팅금액 당 저장한 어레이
+1|jackpot | boolean | 잭팟 여부
+1.2|phaseMultiple | int | 다음번 리프레시에서 전체 다이렉트 페이 심볼에 곱할 배수
+1.2|isRefresh | boolean | 페이즈 변경 여부(리프레시)
+1.2|shuffledReelIdx | int Array(18) | 순서를 섞은 릴 인덱스
+1.2|lockedReel | int Array(18) | 락이 걸려있는 릴 들의 배열(-1이면 lock이 안걸린것, 나머지 양수면 lock걸린 릴의 랜드값)
 
 ### Response Parameters in DEBUG
 
 Parameter | Default | Description
 --------- | ------- | -----------
-DEBUG_FOR_CLIENT_GRID | int Array(5x4) Array(릴어레이갯수) | 랜드한 그리드 결과
+DEBUG_FOR_CLIENT_SYMBOL_INFO_ARR | string Array(18) | 랜드한 심볼 이름
+
+> Request  
+
+```javascript
+// Define Pick Game Signal From parSheet
+var SIG.RED_LINK_GAME = this.parSheet.actions.redLinkSpin;
+
+// Signal Handler on Client side
+handle_signal: function( msg ) {
+        switch( msg.protocol ) {
+            case SIG.RED_LINK_GAME: {
+                ...
+            }
+                break;
+            ...
+```
 
 > Response
 
 ```json
 {
     "protocol": 120,
-    "action":4,
+    "action": 2,
+    "code": 200,
+    "shuffledRandArr":[7,17,13,7,17,14,11,7,5,9,13,18,9,13,5,18,17,1],
+    "shuffledRandsExceptLock":[-1,-1,-1,-1,-1,14,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+    "shuffledRandIds":[44,53,52,44,53,23,51,44,43,50,52,99,50,52,43,99,53,41],
+    "currWinOnLock":[720,180,135,720,180,0,90,720,1800,45,135,376785,45,135,1800,377865,180,90000],
+    "eachWin":468000,
+    "viewTotalWin":1022490,
+    "linkSpinTotalWin":1874025,
+    "initFreeSpinCount":8,
+    "redLinkSpinCount":1,
+    "redSymbolCountArr":[8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8],
+    "blueSymbolCountArr":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],
+    "jackpot":false,
+    "phaseMultiple":1.2,
+    "isRefresh":false,
+    "shuffledReelIdx":[11,14,6,2,8,9,1,7,4,13,17,15,0,3,10,12,5,16],
+    "lockedReel":[7,17,13,7,17,-1,11,7,5,9,13,18,9,13,5,18,17,1],
+    "DEBUG_FOR_CLIENT_SYMBOL_INFO_ARR":[44,53,52,44,53,23,51,44,43,50,52,99,50,52,43,99,53,41]
+}
+```
+
+> Error Response
+
+```json
+```
+
+## Claim Link Spin Total Win
+Rev 1.2에서 추가  
+링크스핀 끝날때 요청
+
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1.2|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+1.2|action | int(4) | 파시트에서 받아온 상수
+1.2|code | int(200) | 서버 OK 리스폰스 넘버
+1.2|linkSpinTotalWin | int(0-max) | 링크스핀 전체의 획득 금액
+1.2|initFreeSpinCount | int(0-max) | 링크스핀 진입 횟수
+1.2|redSymbolCount | int(0-max) | 현재(이번 스핀)까지 획득한 레드심볼 수
+1.2|blueSymbolCount | int(0-max) | 현재(이번 스핀)까지 획득한 블루심볼 수
+1.2|redSymbolCountArr | int(8-max) Array(배팅인덱스 수) | 레드 심볼 카운트를 배팅금액 당 저장한 어레이
+1.2|blueSymbolCountArr | int(5-max) Array(배팅인덱스 수) | 블루 심볼 카운트를 배팅금액 당 저장한 어레이
+1.2|betIndex | int(0-max) | Bet 금액 인덱스
+
+> Request  
+
+```javascript
+// Define Pick Game Signal From parSheet
+var SIG.CLAIM_LINK_SPIN_TOTAL_WIN = this.parSheet.actions.claimResultWin;
+
+// Signal Handler on Client side
+handle_signal: function( msg ) {
+        switch( msg.protocol ) {
+            case SIG.CLAIM_LINK_SPIN_TOTAL_WIN: {
+                ...
+            }
+                break;
+            ...
+```
+
+> Response
+
+```json
+{
+    "protocol": 120,
+    "action": 3,
     "code":200,
-    "rands":[[41,33,48,24,19],[36,42,40,12,19]],
-    "result":[
-        [
-            {"win":10,"matchSymbolID":23,"name":"CloverMinor","matchCount":4,"lineIndex":1,"wildCount":3},
-            {"win":4,"matchSymbolID":22,"name":"HeartMinor","matchCount":3,"lineIndex":4,"wildCount":2},
-            {"win":10,"matchSymbolID":23,"name":"CloverMinor","matchCount":4,"lineIndex":8,"wildCount":3},
-            {"win":4,"matchSymbolID":24,"name":"DiamondMinor","matchCount":3,"lineIndex":11,"wildCount":2},
-            {"win":4,"matchSymbolID":22,"name":"HeartMinor","matchCount":3,"lineIndex":14,"wildCount":2},
-            {"win":4,"matchSymbolID":24,"name":"DiamondMinor","matchCount":3,"lineIndex":19,"wildCount":2},
-            {"win":4,"matchSymbolID":24,"name":"DiamondMinor","matchCount":3,"lineIndex":20,"wildCount":2},
-            {"win":10,"matchSymbolID":23,"name":"CloverMinor","matchCount":4,"lineIndex":23,"wildCount":3},
-            {"win":4,"matchSymbolID":22,"name":"HeartMinor","matchCount":3,"lineIndex":26,"wildCount":2},
-            {"win":4,"matchSymbolID":23,"name":"CloverMinor","matchCount":3,"lineIndex":30,"wildCount":2},
-            {"win":4,"matchSymbolID":24,"name":"DiamondMinor","matchCount":3,"lineIndex":33,"wildCount":2},
-            {"win":4,"matchSymbolID":22,"name":"HeartMinor","matchCount":3,"lineIndex":36,"wildCount":2},
-            {"win":4,"matchSymbolID":24,"name":"DiamondMinor","matchCount":3,"lineIndex":41,"wildCount":2},
-            {"win":4,"matchSymbolID":24,"name":"DiamondMinor","matchCount":3,"lineIndex":42,"wildCount":2},
-            {"win":4,"matchSymbolID":23,"name":"CloverMinor","matchCount":3,"lineIndex":45,"wildCount":2},
-            {"win":4,"matchSymbolID":24,"name":"DiamondMinor","matchCount":3,"lineIndex":49,"wildCount":2}
-        ],
-        []
-    ],
-    "reelArrayWins":[82,0],
-    "reelArrayJackpots":[false,false],
-    "freeSpinTotalWin":4290,
-    "remainSpinCount":2,
-    "wildReelIdxArr":[0],
-    "nextStrip":[
-        [12,12,12,12,12,12,12,12,12,12,12,12,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [12,12,12,12,12,12,12,12,12,12,12,12,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [12,12,12,12,12,12,12,12,12,12,12,12,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [12,12,12,12,12,12,12,12,12,12,12,12,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [12,12,12,12,12,12,12,12,12,12,12,12,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14]
-    ],
-    "DEBUG_FOR_CLIENT_GRID":[
-        [
-            [1,15,13,23,16],[1,16,14,1,21],[1,21,15,11,22],[1,22,16,12,23]
-        ],[
-            [1,15,13,23,16],[1,16,14,1,21],[1,21,15,11,22],[1,22,16,12,23]
-        ]
-    ]
+    "linkSpinTotalWin":1005165,
+    "initFreeSpinCount":8,
+    "blueSymbolCount":6,
+    "redSymbolCount":8,
+    "redSymbolCountArr":[8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8],
+    "blueSymbolCountArr":[5,5,6,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],
+    "betIndex":2
 }
 ```
 
-> Response on Jackpot
+> Error Response
+
+```json
+```
+
+## Claim Phase Change
+Rev 1.2에서 추가  
+페이즈 변할때 요청
+
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1.2|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+1.2|action | int(5) | 파시트에서 받아온 상수
+1.2|code | int(200) | 서버 OK 리스폰스 넘버
+1.2|betCash | int(0-max) | 배팅 금액
+1.2|phaseChangeJackpotInfo | int(0-max) Array(4) | 페이즈 체인지할때의 잭팟 인포 배열
+1.2|phaseMultiple | int | 리프레시에서 전체 다이렉트 페이 심볼에 곱할 배수
+
+> Request  
+
+```javascript
+// Define Pick Game Signal From parSheet
+var SIG.CLAIM_PHASE_CHANGE = this.parSheet.actions.claimPhaseChange;
+
+// Signal Handler on Client side
+handle_signal: function( msg ) {
+        switch( msg.protocol ) {
+            case SIG.CLAIM_PHASE_CHANGE: {
+                ...
+            }
+                break;
+            ...
+```
+
+> Response
 
 ```json
 {
     "protocol": 120,
     "action": 4,
-    "code": 200,
-    "rands":[[11,33,23,24,19],[23,32,32,12,19]],
-    "result":[
-        [
-            {"win":80000,"name":"Jackpot","matchSymbolID":1,"matchCount":50,"wildCount":50}
-        ],
-        [
-            {"win":80000,"name":"Jackpot","matchSymbolID":1,"matchCount":50,"wildCount":50}
-        ]
-    ],
-    "reelArrayWins":[80000,80000],
-    "reelArrayJackpots":[true,true],
-    "freeSpinTotalWin":160000,
-    "remainSpinCount":7,
-    "wildReelIdxArr":[0],
-    "nextStrip":[
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14]
-    ],
-    "DEBUG_FOR_CLIENT_GRID":[
-        [
-            [1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1]
-        ],[
-            [1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1]
-        ]
-    ]
+    "code":200,
+    "betCash":90,
+    "phaseChangeJackpotInfo":[720,1800,9000,90000],
+    "phaseMultiple":1
 }
 ```
 
@@ -926,117 +639,55 @@ DEBUG_FOR_CLIENT_GRID | int Array(5x4) Array(릴어레이갯수) | 랜드한 그
 ```json
 ```
 
-## Super Diamond Spin
-`Super Diamond Wheel Game` 결과를 기반으로 프리스핀 진행
+## Claim Phase Change
+Rev 1.2에서 추가  
+페이즈 변할때 인덱스를 담아서 요청
 
-<aside class="success">
-Remember — `FreeSpin`, `Diamond Spin`, `Super Diamond Spin`은 기본적으로 같은 구조의 리스폰스를 보냄
-</aside>
+### Request Parameters
 
-> Request      
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1.2|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1.2|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+1.2|action | int(6) | 파시트에서 받아온 상수
+1.2|code | int(200) | 서버 OK 리스폰스 넘버
+1.2|jackpotType | string | `Minor`, `Minor`, `Minor`, `Minor` 중에 하나
+1.2|betCash | int(0-max) | 배팅 금액
+1.2|jackpotInfo | int(0-max) Array(4) | 새로운 잭팟 인포 배열
+1.2|phaseMultiple | int | 리프레시에서 전체 다이렉트 페이 심볼에 곱할 배수
+
+> Request  
 
 ```javascript
-// Define Signal From parSheet
-var SIG.SUPER_DIAMOND_SPIN_GAME_SIGNAL = this.parSheet.actions.superDiamondSpinGame;
+// Define Pick Game Signal From parSheet
+var SIG.CLAIM_JACKPOT = this.parSheet.actions.claimJackpot;
 
 // Signal Handler on Client side
 handle_signal: function( msg ) {
         switch( msg.protocol ) {
-            case SIG.SUPER_DIAMOND_SPIN_GAME_SIGNAL: {
+            case SIG.CLAIM_JACKPOT: {
                 ...
             }
                 break;
             ...
 ```
 
-### Response Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
-action | int(5) | 파시트에서 받아온 상수
-code | int(200) | 서버 OK 리스폰스 넘버
-rands | int Array(5x릴어레이갯수) | 릴어레이 갯수 만큼의 랜드값
-result | object Array(당첨항목수x릴어레이갯수) | 각 릴어레이의 획득 결과 내용이 담긴 어레이
-reelArrayWins | int Array(릴어레이갯수) | 릴 어레이별로 획득한 총 금액(result의 합산)
-reelArrayJackpots | boolean | 릴 어레이별 잭팟 당첨 여부
-freeSpinTotalWin | 프리스핀 중의 총 획득 금액
-remainSpinCount | 현재 남은 스핀 횟수
-wildReelIdxArr | int Array(1-4) | 다이아몬드휠피쳐에서 당첨된 와일드로 가득찬(잠긴) 어레이의 인덱스가 담긴 배열(ex: `[0]`이면 각 릴 어레이의 1번째 릴이 와일드로 잠김)
-nextStrip | int Array(스트립길이x5) | 다음번 스핀시 돌릴 스트립들
-
-### Response Parameters in DEBUG
-
-Parameter | Default | Description
---------- | ------- | -----------
-DEBUG_FOR_CLIENT_GRID | int Array(5x4) Array(릴어레이갯수) | 랜드한 그리드 결과
-
 > Response
 
 ```json
 {
     "protocol": 120,
-    "action":5,
+    "action": 6,
     "code":200,
-    "rands":[[17,6,14,1,30],[2,41,43,29,10]],
-    "result":[[],[]],
-    "reelArrayWins":[0,0],
-    "reelArrayJackpots":[false,false],
-    "freeSpinTotalWin":972,
-    "remainSpinCount":1,
-    "wildReelIdxArr":[0],
-    "nextStrip":[
-        [15,15,15,90,90,90,90,90,15,15,15,15,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [15,15,15,90,90,90,90,90,15,15,15,15,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [15,15,15,90,90,90,90,90,15,15,15,15,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [15,15,15,90,90,90,90,90,15,15,15,15,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [15,15,15,90,90,90,90,90,15,15,15,15,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14]
-    ],
-    "DEBUG_FOR_CLIENT_GRID":[
-        [
-            [1,14,16,14,24],[1,15,21,15,24],[1,16,22,16,24],[1,21,23,21,1]
-        ],[
-            [1,14,16,14,24],[1,15,21,15,24],[1,16,22,16,24],[1,21,23,21,1]
-        ]
-    ]
-}
-```
-
-> Response on Jackpot
-
-```json
-{
-    "protocol": 120,
-    "action": 5,
-    "code": 200,
-    "rands":[[11,22,44,24,19],[23,32,32,12,19]],
-    "result":[
-        [
-            {"win":80000,"name":"Jackpot","matchSymbolID":1,"matchCount":50,"wildCount":50}
-        ],
-        [
-            {"win":80000,"name":"Jackpot","matchSymbolID":1,"matchCount":50,"wildCount":50}
-        ]
-    ],
-    "reelArrayWins":[80000,80000],
-    "reelArrayJackpots":[true,true],
-    "freeSpinTotalWin":160000,
-    "remainSpinCount":7,
-    "wildReelIdxArr":[0],
-    "nextStrip":[
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14],
-        [23,23,23,23,23,23,23,23,23,23,23,23,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14,15,16,21,22,23,24,90,1,11,12,13,14]
-    ],
-    "DEBUG_FOR_CLIENT_GRID":[
-        [
-            [1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1]
-        ],[
-            [1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1]
-        ]
-    ]
+    "jackpotType": "Minor",
+    "betCash":90,
+    "jackpotInfo":[720,1800,9000,90000],
+    "phaseMultiple":1
 }
 ```
 
@@ -1051,13 +702,13 @@ DEBUG_FOR_CLIENT_GRID | int Array(5x4) Array(릴어레이갯수) | 랜드한 그
 프로토콜 문서
 </aside>
 
-Slot No.82 Diamond Cats
+Slot No.85 LunarFortune
 
 Code | Meaning | Argument
 ---------- | ------- | -------
-0 | catWheelGame | None
-1 | diamondWheelGame | None
-2 | superDiamondWheelGame | None
-3 | freeSpinGame | None
-4 | diamondSpinGame | None
-5 | superDiamondSpinGame | None
+1 | Pick Game | None
+2 | blueLinkSpin | None
+3 | redLinkSpin | None
+4 | claimResultWin | grid(1d array) index 
+5 | claimPhaseChange | None
+6 | claimJackpot | index(int)
