@@ -15,8 +15,19 @@ search: true
 ---
 
 # Slot No.85 LunarFortune 메시지 프로토콜 소개 문서
-
+### Rev 1.1
 이하 호출 프로토콜에서 기본으로 필요한 `SIG_SLOT protocol`은 설명에서 제외.
+
+## 수정내역
+### Rev 1
+2019-06-12 18:00 
+
++ 기본사항
+
+### Rev 1.1
+2019-06-19 11:55
+
++ PickGame Result 패킷에 프리스핀 횟수 추가
 
 # 슬롯(룸) 입장
 
@@ -291,6 +302,7 @@ action | int(0) | 파시트에서 받아온 상수
 code | int(200) | 서버 OK 리스폰스 넘버
 isRed | boolean | 레드 링크에 당첨되었는지 여부
 isBlue | boolean | 블루 링크에 당첨되었는지 여부
+freeSpinCount | int(1-max) | 프리스핀 횟수(ex: 8(최소 프리스핀횟수, 기본값) + 각 게임(red, blue)을 위해 획득한 심볼갯수)
 result | int(-1 or 1) Array(3) | 0번 인덱스가 유저가 고른 결과, 나머지는 셔플된 결과. 1이면 Red Link이고 -1 이면 Blue Link
 
 > Request  
@@ -319,7 +331,9 @@ handle_signal: function( msg ) {
     "code": 200,
     "isRed": true,
     "isBlue": false,
-    "result": [1,-1,-1]
+    "freeSpinCount": 8,
+    "result": [1,-1,-1],
+    
 }
 ```
 
