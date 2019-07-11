@@ -15,6 +15,16 @@ search: true
 ---
 
 # Slot No.85 LunarFortune 메시지 프로토콜 소개 문서
+
+<p>
+<div class="mermaid">
+  graph LR
+      A --- B
+      B-->C[fa:fa-ban forbidden]
+      B-->D(fa:fa-spinner);
+</div>
+</p>
+
 ### Rev 1.2
 이하 호출 프로토콜에서 기본으로 필요한 `SIG_SLOT protocol`은 설명에서 제외.
 

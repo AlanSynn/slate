@@ -639,9 +639,9 @@ handle_signal: function( msg ) {
 ```json
 ```
 
-## Claim Phase Change
+## Claim Jackpot
 Rev 1.2에서 추가  
-페이즈 변할때 인덱스를 담아서 요청
+페이즈 변환의 경우 인덱스를 담아서 요청
 
 ### Request Parameters
 

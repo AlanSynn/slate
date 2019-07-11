@@ -73,8 +73,12 @@ html, body {
 
   // This is the logo at the top of the ToC
   .logo {
+    border-radius: 50%;
     display: block;
-    max-width: 100%;
+    width: 50%;
+    padding: 10px 0 10px 0;
+    margin-left: auto;
+    margin-right: auto;
     margin-bottom: $logo-margin;
   }
 
@@ -612,4 +616,14 @@ html, body {
 
 .highlight, .highlight .w {
   background-color: $code-bg;
+}
+
+// Mermaid
+.mermaid {
+  margin-right: $examples-width;
+    padding: 0 $main-padding;
+    box-sizing: border-box;
+    display: block;
+
+    @extend %left-col;
 }
