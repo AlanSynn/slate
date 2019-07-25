@@ -6,16 +6,18 @@ language_tabs: # must be one of https://git.io/vQNgJ
 
 toc_footers:
   - <a href='https://alansynn.com'>Documented by Alan Synn</a>
-  - Rev 1.2
+  - Rev 1.3
 
 includes:
   - slot
 
-search: true
+search: false
+print: false
 ---
 
 # Slot No.85 LunarFortune 메시지 프로토콜 소개 문서
-### Rev 1.2
+
+### Rev 1.3
 이하 호출 프로토콜에서 기본으로 필요한 `SIG_SLOT protocol`은 설명에서 제외.
 
 ## 수정내역
@@ -35,6 +37,10 @@ search: true
 + Claim Jackpot 추가
 + Phase Multiple(리프레시시 라벨 배수) 추가
 + 스핀 멈췄을때 다이렉트 페이 값 추가
+
+### Rev 1.3
+2019-07-11 17:02
+오타 수정
 
 # 슬롯(룸) 입장
 
@@ -221,7 +227,7 @@ Rev | Parameter | Default | Description
 1|code | int(200) | 서버 OK 리스폰스 넘버
 1|rands | int(0-스트립길이) Array(3) | 랜드값
 1|isPickGame | boolean | 픽게임에 당첨되었는지 여부
-1.2|directPayInfo | int(-1-max) | 스핀 결과때 다이렉트 페이 심볼에 띄워줄 금액(row 기준)
+1.2|directPayInfo | int(-1-max) | 스핀 결과때 다이렉트 페이 심볼에 띄워줄 금액, value(row 기준)
 1|redOverlayArr | int(-1 or 1) Array(9) | 레드 오버레이 심볼 1d 어레이 1이면 있는것, -1이면 없는것(row 기준)
 1|blueOverlayArr | int(-1 or 1) Array(9) | 블루 오버레이 심볼 1d 어레이 1이면 있는것, -1이면 없는것(row 기준)
 1.2|redSymbolCount | int(0-max) | 현재(이번 스핀)까지 획득한 레드심볼 수
@@ -336,13 +342,11 @@ Spin 요청
 var SIG.PICK_GAME_SIGNAL = this.parSheet.actions.pickGame;
 
 // Signal Handler on Client side
-handle_signal: function( msg ) {
-        switch( msg.protocol ) {
-            case SIG.PICK_GAME_SIGNAL: {
-                ...
-            }
-                break;
-            ...
+RockN.NET.request( 'connector.gameHandler.request', {
+                    protocol: SIG.SIG_SLOT_CUSTOM_ACTION,
+                    action: SIG.PICK_GAME_SIGNAL,
+                    playerID: RockN.Player.playerID,
+                }, func..
 ```
 
 > Response
@@ -412,13 +416,11 @@ DEBUG_FOR_CLIENT_SYMBOL_INFO_ARR | string Array(9) | 랜드한 심볼 이름
 var SIG.BLUE_LINK_GAME = this.parSheet.actions.blueLinkSpin;
 
 // Signal Handler on Client side
-handle_signal: function( msg ) {
-        switch( msg.protocol ) {
-            case SIG.BLUE_LINK_GAME: {
-                ...
-            }
-                break;
-            ...
+RockN.NET.request( 'connector.gameHandler.request', {
+                    protocol: SIG.SIG_SLOT_CUSTOM_ACTION,
+                    action: SIG.BLUE_LINK_GAME,
+                    playerID: RockN.Player.playerID,
+                }, func..
 ```
 
 > Response
@@ -492,13 +494,11 @@ DEBUG_FOR_CLIENT_SYMBOL_INFO_ARR | string Array(18) | 랜드한 심볼 이름
 var SIG.RED_LINK_GAME = this.parSheet.actions.redLinkSpin;
 
 // Signal Handler on Client side
-handle_signal: function( msg ) {
-        switch( msg.protocol ) {
-            case SIG.RED_LINK_GAME: {
-                ...
-            }
-                break;
-            ...
+RockN.NET.request( 'connector.gameHandler.request', {
+                    protocol: SIG.SIG_SLOT_CUSTOM_ACTION,
+                    action: SIG.RED_LINK_GAME,
+                    playerID: RockN.Player.playerID,
+                }, func..
 ```
 
 > Response
@@ -559,13 +559,11 @@ Rev | Parameter | Default | Description
 var SIG.CLAIM_LINK_SPIN_TOTAL_WIN = this.parSheet.actions.claimResultWin;
 
 // Signal Handler on Client side
-handle_signal: function( msg ) {
-        switch( msg.protocol ) {
-            case SIG.CLAIM_LINK_SPIN_TOTAL_WIN: {
-                ...
-            }
-                break;
-            ...
+RockN.NET.request( 'connector.gameHandler.request', {
+                    protocol: SIG.SIG_SLOT_CUSTOM_ACTION,
+                    action: SIG.CLAIM_LINK_SPIN_TOTAL_WIN,
+                    playerID: RockN.Player.playerID,
+                }, func..
 ```
 
 > Response
@@ -612,13 +610,11 @@ Rev | Parameter | Default | Description
 var SIG.CLAIM_PHASE_CHANGE = this.parSheet.actions.claimPhaseChange;
 
 // Signal Handler on Client side
-handle_signal: function( msg ) {
-        switch( msg.protocol ) {
-            case SIG.CLAIM_PHASE_CHANGE: {
-                ...
-            }
-                break;
-            ...
+RockN.NET.request( 'connector.gameHandler.request', {
+                    protocol: SIG.SIG_SLOT_CUSTOM_ACTION,
+                    action: SIG.CLAIM_PHASE_CHANGE,
+                    playerID: RockN.Player.playerID,
+                }, func..
 ```
 
 > Response
@@ -656,7 +652,7 @@ Rev | Parameter | Default | Description
 1.2|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
 1.2|action | int(6) | 파시트에서 받아온 상수
 1.2|code | int(200) | 서버 OK 리스폰스 넘버
-1.2|jackpotType | string | `Minor`, `Minor`, `Minor`, `Minor` 중에 하나
+1.2|jackpotIndex | int(0-3) | `Minor`일때 0, `Major`일때 1, `Mega`일때 2, `Grand`일때 3
 1.2|betCash | int(0-max) | 배팅 금액
 1.2|jackpotInfo | int(0-max) Array(4) | 새로운 잭팟 인포 배열
 1.2|phaseMultiple | int | 리프레시에서 전체 다이렉트 페이 심볼에 곱할 배수
@@ -668,13 +664,12 @@ Rev | Parameter | Default | Description
 var SIG.CLAIM_JACKPOT = this.parSheet.actions.claimJackpot;
 
 // Signal Handler on Client side
-handle_signal: function( msg ) {
-        switch( msg.protocol ) {
-            case SIG.CLAIM_JACKPOT: {
-                ...
-            }
-                break;
-            ...
+RockN.NET.request( 'connector.gameHandler.request', {
+                    protocol: SIG.SIG_SLOT_CUSTOM_ACTION,
+                    action: SIG.CLAIM_JACKPOT,
+                    playerID: RockN.Player.playerID,
+                    index: `잭팟이 위치한 인덱스(1차원 배열)`,
+                }, func..
 ```
 
 > Response
