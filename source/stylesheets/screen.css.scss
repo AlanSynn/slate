@@ -157,7 +157,8 @@ html, body {
 
   // This is the currently selected ToC entry
   .toc-link.active {
-    background-color: $nav-active-bg;
+    // background-color: $nav-active-bg;
+    background-color: $nav-active-parent-bg;
     color: $nav-active-text;
   }
 
@@ -339,6 +340,16 @@ html, body {
     @extend %left-col;
   }
 
+  .mermaid {
+    margin-right: $examples-width;
+    padding: 0 $main-padding;
+    box-sizing: border-box;
+    display: block;
+    clear: none;
+
+    @extend %left-col;
+  }
+
   &>ul, &>ol {
     padding-left: $main-padding + 15px;
   }
@@ -367,7 +378,7 @@ html, body {
 
   h2 {
     @extend %header-font;
-    font-size: 19px;
+    font-size: 22px;
     margin-top: 4em;
     margin-bottom: 0;
     border-top: 1px solid #ccc;
@@ -385,13 +396,13 @@ html, body {
 
   h3, h4, h5, h6 {
     @extend %header-font;
-    font-size: 15px;
+    font-size: 17px;
     margin-top: 2.5em;
     margin-bottom: 0.8em;
   }
 
   h4, h5, h6 {
-    font-size: 10px;
+    font-size: 15px;
   }
 
   hr {
@@ -607,6 +618,16 @@ html, body {
 
   %right-col + %left-col {
     margin-top: $main-padding;
+  }
+
+  // Mermaid
+  .mermaid {
+    margin-right: $examples-width;
+    padding: 0 $main-padding;
+    box-sizing: border-box;
+    display: block;
+
+    @extend %left-col;
   }
 }
 

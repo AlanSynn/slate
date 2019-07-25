@@ -38,7 +38,8 @@
       $toc.find(tocLinkSelector).each(function() {
         var targetId = $(this).attr('href');
         if (targetId[0] === "#") {
-          headerHeights[targetId] = $(targetId).offset().top;
+          // headerHeights[targetId] = $(targetId).offset().top;
+          headerHeights[targetId] = $(targetId).offset();
         }
       });
     };
@@ -66,27 +67,27 @@
         loaded = true;
       }
 
-      var $best = $toc.find("[href='" + best + "']").first();
-      if (!$best.hasClass("active")) {
-        // .active is applied to the ToC link we're currently on, and its parent <ul>s selected by tocListSelector
-        // .active-expanded is applied to the ToC links that are parents of this one
-        $toc.find(".active").removeClass("active");
-        $toc.find(".active-parent").removeClass("active-parent");
-        $best.addClass("active");
-        $best.parents(tocListSelector).addClass("active").siblings(tocLinkSelector).addClass('active-parent');
-        $best.siblings(tocListSelector).addClass("active");
-        $toc.find(tocListSelector).filter(":not(.active)").slideUp(150);
-        $toc.find(tocListSelector).filter(".active").slideDown(150);
-        if (window.history.replaceState) {
-          window.history.replaceState(null, "", best);
-        }
-        var thisTitle = $best.data("title")
-        if (thisTitle !== undefined && thisTitle.length > 0) {
-          document.title = thisTitle + " – " + originalTitle;
-        } else {
-          document.title = originalTitle;
-        }
-      }
+      // var $best = $toc.find("[href='" + best + "']").first();
+      // if (!$best.hasClass("active")) {
+      //   // .active is applied to the ToC link we're currently on, and its parent <ul>s selected by tocListSelector
+      //   // .active-expanded is applied to the ToC links that are parents of this one
+      //   $toc.find(".active").removeClass("active");
+      //   $toc.find(".active-parent").removeClass("active-parent");
+      //   $best.addClass("active");
+      //   $best.parents(tocListSelector).addClass("active").siblings(tocLinkSelector).addClass('active-parent');
+      //   $best.siblings(tocListSelector).addClass("active");
+      //   $toc.find(tocListSelector).filter(":not(.active)").slideUp(150);
+      //   $toc.find(tocListSelector).filter(".active").slideDown(150);
+      //   if (window.history.replaceState) {
+      //     window.history.replaceState(null, "", best);
+      //   }
+      //   var thisTitle = $best.data("title")
+      //   if (thisTitle !== undefined && thisTitle.length > 0) {
+      //     document.title = thisTitle + " – " + originalTitle;
+      //   } else {
+      //     document.title = originalTitle;
+      //   }
+      // }
     };
 
     var makeToc = function() {
@@ -99,7 +100,7 @@
         return false;
       });
       $(".page-wrapper").click(closeToc);
-      $(".toc-link").click(closeToc);
+      // $(".toc-link").click(closeToc);
 
       // reload immediately after scrolling on toc click
       $toc.find(tocLinkSelector).click(function() {
