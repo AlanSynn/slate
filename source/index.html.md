@@ -345,29 +345,29 @@ Parameter | Default | Description
 ## FlowChart
 <div class="mermaid">
 graph TD
-    S[신규진입 초기화 상태 == no SyncParams] -->F1((Spin))
+    S[신규진입 초기화 상태 == no SyncParams] -->F1(Spin Request)
     F1 --> R[onSpinResponse 수신 및 클라이언트 동작 완료 : 동기화 포인트1]
-    R --> B{onSpinResponse 판단}
-    B -->|isJackpotBonusGame == true| F3[jackpotBonusGame 진입 및 팝업]
-    F3 --> F3-1[jackpotBonusGame Request]
+    R --> B{onSpinResponse}
+    B -->|isJackpotBonusGame == true| F3>jackpotBonusGame 진입 및 팝업]
+    F3 --> F3-1(jackpotBonusGame Request)
     F3-1 --> F3-2[jackpotBonusGameResponse 수신 및 클라이언트 동작 완료 : 동기화 포인트2]
-    F3-2 --> Q[ClaimJackpotBonusGameWin 추가??]
+    F3-2 --> Q(ClaimJackpotBonusGameWin 추가??)
     Q --> F2
-    B -->|isBonusGame == true| F2[BonusGame 진입 및 팝업]
-    F2 --> F2-1[BonusGame Request]
+    B -->|isBonusGame == true| F2>BonusGame 진입 및 팝업]
+    F2 --> F2-1(BonusGame Request)
     F2-1 --> F2-2[BonusGameResponse 수신 및 클라이언트 동작 완료 : 동기화 포인트3]
     F2-2 --> F3
-    F2-2 --> Q2[ClaimBonusGameWin 추가??]
-    Q2 --> F4[프리스핀 진입 및 팝업]
-    F4 --> F4-R[프리스핀 Request]
+    F2-2 --> Q2(ClaimBonusGameWin 추가??)
+    Q2 --> F4>프리스핀 진입 및 팝업]
+    F4 --> F4-R(프리스핀 Request)
     F4-R --> F4-1[프리스핀Response 수신 : 동기화 포인트4]
     F4-1 --> F4-Q{is2ndChance == true?}
-    F4-Q --> |Yes| F4-2[프리스핀 2nd Chance 팝업]
+    F4-Q --> |Yes| F4-2>프리스핀 2nd Chance 팝업]
     F4-Q --> |No| F4-3
     F4-2 --> F4-3[프리스핀 클라이언트 동작 완료]
     F4-3 --> F4-R
-    F4-3 --> F4-Q2[claimFreeSpinWin]
-    F4-Q2 --> F4-4[프리스핀 종료 팝업]
+    F4-3 --> F4-Q2(claimFreeSpinWin)
+    F4-Q2 --> F4-4>프리스핀 종료 팝업]
     F4-4 --> E[피쳐 종료]
     style R fill:#ED5752
     style F2-2 fill:#ED5752
