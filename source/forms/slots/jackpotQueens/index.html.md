@@ -253,94 +253,6 @@ Rev | Parameter | Default | Description
 Parameter | Default | Description
 --------- | ------- | -----------
 
-## Bonus Game
-
-> Request  
-Spin 요청
-
-```javascript
-// Define Signal From parSheet
-var SIG.BONUS_GAME = this.parSheet.customAction.bonusGame;
-
-// Signal Handler on Client side
-RockN.NET.request( 'connector.gameHandler.request', {
-                    protocol: SIG.SIG_SLOT_CUSTOM_ACTION,
-                    action: SIG.BONUS_GAME,
-                    playerID: RockN.Player.playerID,
-                }, func..
-```
-
-> Response
-
-```json
-{
-    "protocol":120,
-    "action": 1,
-    "code":200,
-    "rands":[37,0,4,39,23],
-    "result":[
-        {"win":2,"matchSymbolID":[21,22,23],"name":"mixed","matchCount":3,"lineIndex":7,"matchPos":[0,1,2]},
-        {"win":2,"matchSymbolID":[21,22,23],"name":"mixed","matchCount":3,"lineIndex":19,"matchPos":[0,1,2]}
-    ],
-    "totalWin":0,
-    "winInfo":{
-        "isMajorWin":false,
-        "majorWinIndex":-1,
-        "multiple":0,
-        "lineMultiple":0
-    },
-    "isBonusGame":false,
-    "isJackpotBonusGame":false
-}
-```
-
-> Error Response
-
-```json
-{
-    "protocol":120,
-    "action": 1,
-    "code":4006
-}
-```
-
-### Sequence Diagram
-<div class="mermaid">
-    sequenceDiagram
-        participant C as Client
-        participant S as Server
-        C->>S: Bonus Game Request
-        alt 당첨없음
-            S-->>C: json(Response Type1)
-        else isBonusGame === true
-            S-->>C: json(Response Type2)
-        else isJackpotBonusGame === true
-            S-->>C: json(Response Type3)
-        end
-</div>
-
-### Response Parameters
-
-Rev | Parameter | Default | Description
---------- | --------- | ------- | -----------
-1|protocol | int(100) | SIG_SLOT_SPIN
-1|code | int(200) | 서버 OK 리스폰스 넘버
-1|rands | int(0-스트립길이) Array(5) | 랜드값
-1|result | object Array | 획득 결과 내용
-1|totalWin | int(0-max) | 획득 결과 금액
-1|isBonusGame | boolean | 보너스게임 당첨 여부
-1|isJackpotBonusGame | boolean | 잭팟보너스게임 당첨 여부
-1|winInfo | object | 획득 정보에 대한 판정을 담은 객체
-1|winInfo.isMajorWin | boolean | 메이져 윈 여부
-1|winInfo.majorWinIndex | int(-1-4) | 메이져윈일 경우의 인덱스
-1|winInfo.multiple | int(0-max) | 당첨금액/총배팅액 결과
-1|winInfo.lineMultiple | int(0-max) | 당첨금액/라인배팅액 결과
-
-### Response Parameters in DEBUG
-
-Parameter | Default | Description
---------- | ------- | -----------
-
 # Sync
 ## FlowChart
 <div class="mermaid">
@@ -356,14 +268,19 @@ graph TD
     B -->|isBonusGame == true| F2>BonusGame 진입 및 팝업]
     F2 --> F2-1(BonusGame Request)
     F2-1 --> F2-2[BonusGameResponse 수신 및 클라이언트 동작 완료 : 동기화 포인트3]
-    F2-2 --> F3
     F2-2 --> Q2(ClaimBonusGameWin 추가??)
     Q2 --> F4>프리스핀 진입 및 팝업]
     F4 --> F4-R(프리스핀 Request)
     F4-R --> F4-1[프리스핀Response 수신 : 동기화 포인트4]
-    F4-1 --> F4-Q{is2ndChance == true?}
-    F4-Q --> |Yes| F4-2>프리스핀 2nd Chance 팝업]
-    F4-Q --> |No| F4-3
+    F4-1 --> F4-Q{onFreeSpinResponse}
+    F5-3 --> F4-R
+    F4-Q --> |is2ndChance == true?| F4-2>프리스핀 2nd Chance 팝업]
+    F4-Q --> |else| F4-3
+    F4-Q --> |isJackpotBonus == true?| F5-1>프리스핀 중 JackpotBonusGame 진입 및 팝업]
+    subgraph JackpotBonusGameInFreeSpin
+    F5-1 --> F5-2[JackpotBonusGame]
+    F5-2 --> F5-3[JackpotBonusGame]
+    end
     F4-2 --> F4-3[프리스핀 클라이언트 동작 완료]
     F4-3 --> F4-R
     F4-3 --> F4-Q2(claimFreeSpinWin)
@@ -431,3 +348,4 @@ Code | Meaning | Argument
 ---------- | ------- | -------
 1 | bonusGame | None
 2 | jackpotBonusGame | None
+3 | claimFreeSpinWin | None
