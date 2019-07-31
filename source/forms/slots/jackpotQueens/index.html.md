@@ -6,7 +6,7 @@ language_tabs: # must be one of https://git.io/vQNgJ
 
 toc_footers:
   - <a href='https://alansynn.com'>Documented by Alan Synn</a>
-  - Rev 1.0
+  - Rev 2.0
 
 includes:
   - slot
@@ -17,14 +17,20 @@ print: false
 
 # Slot No.88 JackpotQueens 메시지 프로토콜 소개 문서
 
-### Rev 1.0
+### Rev 2.0
 이하 호출 프로토콜에서 기본으로 필요한 `SIG_SLOT protocol`은 설명에서 제외.
 
 ## 수정내역
-### Rev 1
+### Rev 1.0
 2019-07-19 18:00 
 
 + 기본 스핀
+
+### Rev 2.0
+2019-07-30 16:00
+
++ 피쳐들 추가
++ 변경 플로우 반영
 
 # 슬롯(룸) 입장
 
@@ -33,12 +39,12 @@ print: false
 ```javascript
 // Signal Handler on Client side
 handle_signal: function( msg ) {
-        switch( msg.protocol ) {
-            case SIG.SIG_SET_SLOT: {
-                ...
-            }
-                break;
+    switch( msg.protocol ) {
+        case SIG.SIG_SET_SLOT: {
             ...
+        }
+            break;
+        ...
 ```
 
 > Response  
@@ -83,8 +89,10 @@ handle_signal: function( msg ) {
             "MinorSymIDs":[21,22,23],
             "EmptySymID":71,
             "customAction":{
-                "bonusGame":1,
-                "jackpotBonusGame":2,
+                "bonusGame": 1,
+                "jackpotBonusGame": 2,
+                "freeSpinGame": 3,
+                "claimFreeSpinWin": 4
             },
             "jackpotLimitBet":50000
         },
@@ -130,38 +138,15 @@ handle_signal: function( msg ) {
 ```javascript
 // Signal Handler on Client side
 handle_signal: function( msg ) {
-        switch( msg.protocol ) {
-            case SIG.SIG_SPIN_SLOT: {
-                ...
-            }
-                break;
+    switch( msg.protocol ) {
+        case SIG.SIG_SPIN_SLOT: {
             ...
+        }
+            break;
+        ...
 ```
 
 > Response Type 1
-
-```json
-{
-    "protocol":100,
-    "code":200,
-    "rands":[37,0,4,39,23],
-    "result":[
-        {"win":2,"matchSymbolID":[21,22,23],"name":"mixed","matchCount":3,"lineIndex":7,"matchPos":[0,1,2]},
-        {"win":2,"matchSymbolID":[21,22,23],"name":"mixed","matchCount":3,"lineIndex":19,"matchPos":[0,1,2]}
-    ],
-    "totalWin":0,
-    "winInfo":{
-        "isMajorWin":false,
-        "majorWinIndex":-1,
-        "multiple":0,
-        "lineMultiple":0
-    },
-    "isBonusGame":false,
-    "isJackpotBonusGame":false
-}
-```
-
-> Response Type 2
 
 ```json
 {
@@ -184,7 +169,7 @@ handle_signal: function( msg ) {
 }
 ```
 
-> Response Type 3
+> Response Type 2
 
 ```json
 {
@@ -207,6 +192,29 @@ handle_signal: function( msg ) {
 }
 ```
 
+> Response Type 3
+
+```json
+{
+    "protocol":100,
+    "code":200,
+    "rands":[37,0,4,39,23],
+    "result":[
+        {"win":2,"matchSymbolID":[21,22,23],"name":"mixed","matchCount":3,"lineIndex":7,"matchPos":[0,1,2]},
+        {"win":2,"matchSymbolID":[21,22,23],"name":"mixed","matchCount":3,"lineIndex":19,"matchPos":[0,1,2]}
+    ],
+    "totalWin":0,
+    "winInfo":{
+        "isMajorWin":false,
+        "majorWinIndex":-1,
+        "multiple":0,
+        "lineMultiple":0
+    },
+    "isBonusGame":false,
+    "isJackpotBonusGame":false
+}
+```
+
 > Error Response
 
 ```json
@@ -221,12 +229,20 @@ handle_signal: function( msg ) {
     sequenceDiagram
         participant C as Client
         participant S as Server
-        C->>S: Bonus Game Request
-        alt 당첨없음
+        participant D as DB
+        C->>S: Spin Request
+        alt isBonusGame === true
+            S->>+D: Request jackpot pool(progressive amount)
+            D-->>-S: Get jackpot pool info
+            S --> S: Store currJackpotInfo
             S-->>C: json(Response Type1)
-        else isBonusGame === true
-            S-->>C: json(Response Type2)
         else isJackpotBonusGame === true
+            S->>+D: Request jackpot pool(progressive amount)
+            D-->>-S: Get jackpot pool info
+            S --> S: Store currJackpotInfo
+            S-->>C: json(Response Type2)
+        end
+        opt 당첨없음
             S-->>C: json(Response Type3)
         end
 </div>
@@ -252,6 +268,333 @@ Rev | Parameter | Default | Description
 
 Parameter | Default | Description
 --------- | ------- | -----------
+DEBUG_GRID | int Array(3x5) | 디버그용 랜드심볼아이디(row순) 
+
+## Jackpot Bonus Game
+
+> Request  
+
+```javascript
+// Define Signal From parSheet
+var SIG.JACKPOT_BONUS_GAME = this.parSheet.actions.jackpotBonusGame;
+
+// Signal Handler on Client side
+RockN.NET.request( 'connector.gameHandler.request', {
+        protocol: SIG.SIG_SLOT_CUSTOM_ACTION,
+        action: SIG.JACKPOT_BONUS_GAME,
+        playerID: RockN.Player.playerID,
+    }, func..
+```
+
+> Response
+
+```json
+{
+    "protocol":120,
+    "action":2,
+    "code":200,
+    "win":600,
+    "rand":1,
+    "randId":42,
+    "jackpotType":"JackpotMajor",
+    "jackpotIndex":2,
+    "currJackpotInfo":[90,240,600,3000,30000],
+    "isFreeSpinMode":false
+}
+```
+
+> Error Response
+
+```json
+{
+    "protocol":120,
+    "action":2,
+    "code":500
+}
+```
+
+### Sequence Diagram
+<div class="mermaid">
+    sequenceDiagram
+        participant C as Client
+        participant S as Server
+        participant D as DB
+        C ->>S: Jackpot Bonus Game Request
+        S ->>+D: Initiate Jackpot Info on jackpotIndex
+        D -->>-S: Get Initiated JackpotInfo on jackpotIndex
+        S ->>S: Change to non-progressive jackpotInfo on jackpotIndex
+        S -->>C: json(Response)
+</div>
+
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+1|action | int(2) | customAction 인덱스
+1|code | int(200) | 서버 OK 리스폰스 넘버
+1|rand | int(0-스트립길이) | 랜드값
+1|randId | int(symbolId) | 랜드한 심볼 아이디
+1|jackpotType | string | 잭팟 타입
+1|jackpotIndex | int(0-4) | 잭팟 인덱스
+1|currJackpotInfo | int(기본 잭팟값-max) Array(5) | 갱신한 잭팟 정보
+1|isFreeSpinMode | boolean | 현재 프리스핀 모드인지 여부
+
+## Bonus Game
+`Rev2.0 변경사항` : 현 Bonus Game은 기획서의 EachWin Wheel을 의미, 보너스게임 진행 후 프리스핀 진행  
+
+> Request  
+
+```javascript
+// Define Signal From parSheet
+var SIG.BONUS_GAME = this.parSheet.actions.bonusGame;
+
+// Signal Handler on Client side
+RockN.NET.request( 'connector.gameHandler.request', {
+        protocol: SIG.SIG_SLOT_CUSTOM_ACTION,
+        action: SIG.BONUS_GAME,
+        playerID: RockN.Player.playerID,
+    }, func..
+```
+
+> Response
+
+```json
+{
+    "protocol":120,
+    "action":1,
+    "code":200,
+    "eachWin":165,
+    "rand":5,
+    "randIds":[54],
+    "initFreeSpinCount":3
+}
+```
+
+> Error Response
+
+```json
+{
+    "protocol":120,
+    "action":1,
+    "code":500
+}
+```
+
+### Sequence Diagram
+<div class="mermaid">
+    sequenceDiagram
+        participant C as Client
+        participant S as Server
+        C ->>S: Bonus Game Request
+        S -->>C: json(Response)
+</div>
+
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+1|action | int(1) | customAction 인덱스
+1|code | int(200) | 서버 OK 리스폰스 넘버
+1|eachWin | int(0-max) | 획득한 EachWin 값
+1|rand | int(0-스트립길이) | 랜드값
+1|randIds | int(symId) Array(1) | 랜드한 심볼 아이디
+1|initFreeSpinCount | int(3) | 시작한(현재 남은) 프리스핀 카운트
+
+## FreeSpin
+
+> Request  
+
+```javascript
+// Define Signal From parSheet
+var SIG.FREESPIN_GAME = this.parSheet.actions.freeSpinGame;
+
+// Signal Handler on Client side
+RockN.NET.request( 'connector.gameHandler.request', {
+        protocol: SIG.SIG_SLOT_CUSTOM_ACTION,
+        action: SIG.FREESPIN_GAME,
+        playerID: RockN.Player.playerID,
+    }, func..
+```
+
+> Response
+
+```json
+{
+    "protocol":120,
+    "action": 3,
+    "code":200,
+    "rands":[29,44,29,19,36],
+    "result":[
+        {"win":2,"matchSymbolID":[21,22,23],"name":"mixed","matchCount":3,"lineIndex":13}
+    ],
+    "eachWinResult":[
+        {"x":3,"y":1,"win":30,"name":"eachWin"}
+    ],
+    "currWin":32,
+    "freeSpinTotalWin":62,
+    "freeSpinCount":2,
+    "is2ndChance":true,
+    "isRefreshSpinCount":true,
+    "isJackpotBonusGame":true
+}
+```
+
+> Error Response
+
+```json
+{
+    "protocol":120,
+    "action":3,
+    "code":500
+}
+```
+
+
+### Sequence Diagram
+<div class="mermaid">
+    sequenceDiagram
+        participant C as Client
+        participant S as Server
+        C ->>S: FreeSpin Game Request
+        S -->>C: json(Response)
+</div>
+
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+1|action | int(3) | customAction 인덱스
+1|code | int(200) | 서버 OK 리스폰스 넘버
+1|rands | int(0-스트립길이) Array(5) | 랜드값
+1|result | object Array | 획득 결과 내용
+1|eachWinResult | object Array | eachWin 획득 결과 오브젝트
+1|eachWinResult.x | int(0-4) | eachWin 획득 심볼 x축 좌표
+1|eachWinResult.y | int(0-2) | eachWin 획득 심볼 y축 좌표
+1|eachWinResult.win | int(0-max) | eachWin 획득 심볼 win 금액
+1|eachWinResult.name | string | (ex. "eachWin")
+1|currWin | int(0-max) | 이번 스핀 획득금액
+1|freeSpinTotalWin | int(0-max) | 프리스핀 총 획득금액
+1|is2ndChance | boolean | is2ndChance 팝업
+1|isRefreshSpinCount | boolean | 스핀 추가 여부
+1|isJackpotBonusGame | boolean | 잭팟 보너스 게임 진입 여부
+
+## Claim FreeSpin Win
+
+> Request  
+
+```javascript
+// Define Signal From parSheet
+var SIG.CLAIM_FREESPIN_WIN = this.parSheet.actions.claimFreeSpinWin;
+
+// Signal Handler on Client side
+RockN.NET.request( 'connector.gameHandler.request', {
+        protocol: SIG.SIG_SLOT_CUSTOM_ACTION,
+        action: SIG.CLAIM_FREESPIN_WIN,
+        playerID: RockN.Player.playerID,
+    }, func..
+```
+
+> Response
+
+```json
+{
+    "protocol":120,
+    "action":4,
+    "code":200,
+    "totalWin": 23450,
+    "initFreeSpinCount": 9
+}
+```
+
+> Error Response
+
+```json
+{
+    "protocol":120,
+    "action":4,
+    "code":500
+}
+```
+
+### Sequence Diagram
+<div class="mermaid">
+    sequenceDiagram
+        participant C as Client
+        participant S as Server
+        C ->>S: Bonus Game Request
+        S -->>C: json(Response)
+</div>
+
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+1|action | int(4) | customAction 인덱스
+1|code | int(200) | 서버 OK 리스폰스 넘버
+1|totalWin | int(0-max) | 피쳐 중 획득한 총 금액 값
+1|initFreeSpinCount | int(3-max) | 피쳐 중 돌았던 총 프리스핀 카운트
+
+## Get Jackpot Info
+
+> Request  
+
+```javascript
+// Signal Handler on Client side
+RockN.NET.request( 'connector.gameHandler.request', {
+        protocol: SIG.SIG_GET_SLOT_JACKPOT_INFO,
+        playerID: RockN.Player.playerID,
+        totalBet: totalBet / this._owner.slotMenu.getBetLines() * this._owner.DEFINES.PAY_LINES
+    }, func..
+```
+
+> Response
+
+```json
+{
+    "protocol":112,
+    "code":200,
+    "betCash":10,
+    "info":[30,80,200,1000,10000]
+}
+```
+
+> Error Response
+
+```json
+{
+    "protocol":112,
+    "code":500
+}
+```
+
+### Sequence Diagram
+<div class="mermaid">
+    sequenceDiagram
+        participant C as Client
+        participant S as Server
+        participant D as DB
+        C ->>S: Jackpot Bonus Game Request
+        alt NormalMode
+            S ->>+D: Get progressive jackpotInfo
+            D -->>-S: Response
+        else currMode != NormalMode
+            S -->S: Get JackpotInfo from currJackpotInfo
+        end
+        S ->>C: json
+</div>
+
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1|protocol | int(112) | SIG_GET_SLOT_JACKPOT_INFO
+1|code | int(200) | 서버 OK 리스폰스 넘버
+1|betCash | int | 유저가 배팅한 금액
+1|info | int Array(5) | jackpotInfo - 노멀모드일 경우에는 실시간 갱신이나 노멀이 아닐 경우 서버에 저장된 currJackpotInfo(피쳐 진입시 저장)를 받음
 
 # Sync
 ## FlowChart
