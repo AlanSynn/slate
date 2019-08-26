@@ -5,8 +5,8 @@ language_tabs: # must be one of https://git.io/vQNgJ
   - json
 
 toc_footers:
-  - <a href='https://alansynn.com'>Documented by Alan Synn</a>
-  - alan@alansynn.com
+  - <a href='http://www.flysher.net'>Flysher Dev Team</a>
+  - http://www.flysher.net
 
 includes:
 
