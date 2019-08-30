@@ -1,0 +1,73 @@
+## Claim FreeSpin Win
+
+> Request
+
+```javascript
+// Define Signal From parSheet
+var SIG.CLAIM_FREESPIN_WIN = this.parSheet.actions.claimFreeSpinWin;
+
+// Signal Handler on Client side
+RockN.NET.request( 'connector.gameHandler.request', {
+        protocol: SIG.SIG_SLOT_CUSTOM_ACTION,
+        action: SIG.CLAIM_FREESPIN_WIN,
+        playerID: RockN.Player.playerID,
+    }, func..
+```
+
+> Response
+
+```json
+{
+    "protocol":120,
+    "action":3,
+    "code":200,
+    "totalWin": 3710,
+    "totalFreeSpinCount": 9,
+    "winInfo":{
+        "isMajorWin":true,
+        "majorWinIndex":-1,
+        "multiple":123,
+        "lineMultiple":3710
+    }
+}
+```
+
+> Error Response
+
+```json
+{
+    "protocol":120,
+    "action":3,
+    "code":500
+}
+```
+
+### Sequence Diagram
+<div class="mermaid">
+    sequenceDiagram
+        participant C as Client
+        participant S as Server
+        C ->>S: Bonus Game Request
+        S -->>C: json(Response)
+</div>
+
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+1|action | int(4) | customAction 인덱스
+1|code | int(200) | 서버 OK 리스폰스 넘버
+1|totalWin | int(0-max) | 피쳐 중 획득한 총 금액 값
+2.1|totalFreeSpinCount | int(6-max) | 피쳐 중 돌았던 총 프리스핀 카운트
+2.1|winInfo | object | 획득 정보에 대한 판정을 담은 객체
+2.1|winInfo.isMajorWin | boolean | 메이져 윈 여부
+2.1|winInfo.majorWinIndex | int(-1-4) | 메이져윈일 경우의 인덱스
+2.1|winInfo.multiple | int(0-max) | 당첨금액/총배팅액 결과
+2.1|winInfo.lineMultiple | int(0-max) | 당첨금액/라인배팅액 결과
+
+### Deprecated Response Parameters
+
+Rev | from | to | Default | Description | Detail
+--------- | --------- | ------- | ----------- | ------- | -------
+2.1|initFreeSpinCount | totalFreeSpinCount | int(3) | 시작한(현재 남은) 프리스핀 카운트 | 시작한 프리스핀 카운트라는 이름이 의미가 없어짐

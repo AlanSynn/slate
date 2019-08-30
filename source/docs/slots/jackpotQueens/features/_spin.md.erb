@@ -1,0 +1,141 @@
+## Spin
+
+> Request
+
+```javascript
+// Signal Handler on Client side
+handle_signal: function( msg ) {
+    switch( msg.protocol ) {
+        case SIG.SIG_SPIN_SLOT: {
+            ...
+        }
+            break;
+        ...
+```
+
+> Response Type 1
+
+```json
+{
+    "protocol":100,
+    "code":200,
+    "rands":[37,0,4,39,23],
+    "result":[
+        {"win":2,"matchSymbolID":[21,22,23],"name":"mixed","matchCount":3,"lineIndex":7,"matchPos":[0,1,2]},
+        {"win":2,"matchSymbolID":[21,22,23],"name":"mixed","matchCount":3,"lineIndex":19,"matchPos":[0,1,2]}
+    ],
+    "totalWin":4,
+    "winInfo":{
+        "isMajorWin":false,
+        "majorWinIndex":-1,
+        "multiple":0,
+        "lineMultiple":4
+    },
+    "isBonusGame":true,
+    "isJackpotBonusGame":false,
+    "DEBUG_GRID" : [[71,71,21,91,11],[21,21,71,71,71],[71,71,12,11,22]]
+}
+```
+
+> Response Type 2
+
+```json
+{
+    "protocol":100,
+    "code":200,
+    "rands":[37,0,4,39,23],
+    "result":[
+        {"win":2,"matchSymbolID":[21,22,23],"name":"mixed","matchCount":3,"lineIndex":7,"matchPos":[0,1,2]},
+        {"win":2,"matchSymbolID":[21,22,23],"name":"mixed","matchCount":3,"lineIndex":19,"matchPos":[0,1,2]}
+    ],
+    "totalWin":4,
+    "winInfo":{
+        "isMajorWin":false,
+        "majorWinIndex":-1,
+        "multiple":0,
+        "lineMultiple":4
+    },
+    "isBonusGame":false,
+    "isJackpotBonusGame":true,
+    "DEBUG_GRID" : [[71,71,21,91,11],[21,21,71,71,71],[71,71,12,11,22]]
+}
+```
+
+> Response Type 3
+
+```json
+{
+    "protocol":100,
+    "code":200,
+    "rands":[37,0,4,39,23],
+    "result":[
+        {"win":2,"matchSymbolID":[21,22,23],"name":"mixed","matchCount":3,"lineIndex":7,"matchPos":[0,1,2]},
+        {"win":2,"matchSymbolID":[21,22,23],"name":"mixed","matchCount":3,"lineIndex":19,"matchPos":[0,1,2]}
+    ],
+    "totalWin":4,
+    "winInfo":{
+        "isMajorWin":false,
+        "majorWinIndex":-1,
+        "multiple":0,
+        "lineMultiple":4
+    },
+    "isBonusGame":false,
+    "isJackpotBonusGame":false,
+    "DEBUG_GRID" : [[71,71,21,91,11],[21,21,71,71,71],[71,71,12,11,22]]
+}
+```
+
+> Error Response
+
+```json
+{
+    "protocol":100,
+    "code":4006
+}
+```
+
+### Sequence Diagram
+<div class="mermaid">
+    sequenceDiagram
+        participant C as Client
+        participant S as Server
+        participant D as DB
+        C->>S: Spin Request
+        alt isBonusGame === true
+            S->>+D: Request jackpot pool(progressive amount)
+            D-->>-S: Get jackpot pool info
+            S --> S: Store currJackpotInfo
+            S-->>C: json(Response Type1)
+        else isJackpotBonusGame === true
+            S->>+D: Request jackpot pool(progressive amount)
+            D-->>-S: Get jackpot pool info
+            S --> S: Store currJackpotInfo
+            S-->>C: json(Response Type2)
+        end
+        opt 당첨없음
+            S-->>C: json(Response Type3)
+        end
+</div>
+
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1|protocol | int(100) | SIG_SLOT_SPIN
+1|code | int(200) | 서버 OK 리스폰스 넘버
+1|rands | int(0-스트립길이) Array(5) | 랜드값
+1|result | object Array | 획득 결과 내용
+1|totalWin | int(0-max) | 획득 결과 금액
+1|isBonusGame | boolean | 보너스게임 당첨 여부
+1|isJackpotBonusGame | boolean | 잭팟보너스게임 당첨 여부
+1|winInfo | object | 획득 정보에 대한 판정을 담은 객체
+1|winInfo.isMajorWin | boolean | 메이져 윈 여부
+1|winInfo.majorWinIndex | int(-1-4) | 메이져윈일 경우의 인덱스
+1|winInfo.multiple | int(0-max) | 당첨금액/총배팅액 결과
+1|winInfo.lineMultiple | int(0-max) | 당첨금액/라인배팅액 결과
+
+### Response Parameters in DEBUG
+
+Parameter | Default | Description
+--------- | ------- | -----------
+DEBUG_GRID | int Array(3x5) | 디버그용 랜드심볼아이디(row순)

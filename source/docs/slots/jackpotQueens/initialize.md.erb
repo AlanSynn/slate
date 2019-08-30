@@ -1,0 +1,117 @@
+# Initialize
+
+> Request
+
+```javascript
+// Signal Handler on Client side
+handle_signal: function( msg ) {
+    switch( msg.protocol ) {
+        case SIG.SIG_SET_SLOT: {
+            ...
+        }
+            break;
+        ...
+```
+
+> Response
+> 상대적으로 긴 정보는 ... 으로 표시.
+
+```json
+{
+    "code": 200,
+    "gameID": 88,
+    "rid": -1,
+    "gameInfo": {
+        "betTable": [250,500,1000,2500,5000,10000,25000,50000,100000,250000,500000,1000000,2500000,5000000,10000000,25000000,50000000,100000000,250000000,500000000,1000000000,2500000000,5000000000,10000000000],
+        "betLimit": [ { "level": 2, "bet": 20000 }, { "level": 6, "bet": 40000 }, { "level": 9, "bet": 80000 } ],
+        "betIndex": -1,
+        "betLines": 30,
+        "betPerLine": 0,
+        "parSheet": {
+            "TEST_MODE": false,
+            "debugFunction":["toMajorInNormal","toJackpotBonusInNormal","toBonusInNormal","toEachWinInFreeSpin","toJackpotBonusInFreeSpin","open1Cell","open2Cell","open3Cell"],
+            "betTable": [250,500,1000,2500,5000,10000,25000,50000,100000,250000,500000,1000000,2500000,5000000,10000000,25000000,50000000,100000000,250000000,500000000,1000000000,2500000000,5000000000,10000000000],
+            "payLines": ["0x11111","0x00000","0x22222","0x01210","0x21012","0x00100","0x22122","0x12221","0x10001","0x01110","0x21112","0x01010","0x21212","0x10101","0x12121","0x11011","0x11211","0x02020","0x20202","0x10201","0x12021","0x00200","0x22022","0x02220","0x20002","0x02120","0x20102","0x11222","0x22100","0x00011"],
+            "symbols": [
+                {"id":71,"name":"Empty","type":0,"typifyName":"jqSymScatter1AR"},
+                ...
+            ],
+            "reels":[
+                {
+                    "index":0,
+                    "strip":[71,91,71,22,71,11,71,21,71,12,71,23,71,91,71,12,71,11,71,21,71,23,71,22,71,91,71,21,71,22,71,11,71,12,71,23,71,91,71,12,71,12,71,21,71,11,71,11],
+                },
+                ...
+            ],
+            "freeSpinReels":[
+                {
+                    "index":0,
+                    "strip":[71,91,71,22,71,11,71,21,71,12,71,23,71,91,71,12,71,11,71,21,71,23,71,22,71,91,71,21,71,22,71,11,71,12,71,23,71,91,71,12,71,12,71,21,71,11,71,11],
+                },
+                ...
+            ],
+            "eachWinWheel":[
+                {
+                    "index":0,
+                    "strip":[51,52,53,54,55,54,53,52,51]
+                },
+                ...
+            ],
+            "jackpotWheel":[
+                {
+                    "index":0,
+                    "strip":[41,42,43,44,45,44,43,42,41]
+                },
+                ...
+            ],
+            "jackpotBonusScatterSymID":91,
+            "BonusScatterSymID":92,
+            "FreeSpinBonusScatterSymID":93,
+            "WildSymID":1,
+            "MajorSymIDs":[11,12],
+            "MinorSymIDs":[21,22,23],
+            "EmptySymID":71,
+            "eachWinSymIdOnFreeSpin":93,
+            "triggerSymbolsIds": [ 91, 92, 93 ],
+            "jackpotSymbolsIds": [ 41, 42, 43, 44, 45 ],
+            "customAction": {
+                "bonusGame": 1,
+                "jackpotBonusGame": 2,
+                "claimFreeSpinWin": 3,
+                "claimBonusGameWin": 4,
+                "claimJackpotBonusGameWin": 5
+            },
+            "jackpotLimitBet":50000
+        },
+    "maxLine":30
+    },
+    "gameParams":null
+}
+```
+
+### SET SLOT
+
+#### Sequence Diagram
+<div class="mermaid">
+    sequenceDiagram
+        participant C as Client
+        participant S as Server
+        participant D as DB
+        C->>S: 게임 접속
+        S->>D: Request user data
+        Note right of D: ex: userInfo, slotBuff
+        activate D
+        D-->>S: user data
+        deactivate D
+        S->>C: 게임 접속 데이터
+        C->>S: 슬롯 입장
+        S->>D: Request user slot sync data
+        activate D
+        D-->>S: Slot Sync Data
+        deactivate D
+        alt 동기화 데이터가 존재할 때
+            S-->>C: json(gameInfo + syncParams)
+        else 동기화 데이터가 없을때
+            S-->>C: json(gameInfo)
+        end
+</div>

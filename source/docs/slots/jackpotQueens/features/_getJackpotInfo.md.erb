@@ -1,0 +1,57 @@
+## Get Jackpot Info
+
+> Request
+
+```javascript
+// Signal Handler on Client side
+RockN.NET.request( 'connector.gameHandler.request', {
+        protocol: SIG.SIG_GET_SLOT_JACKPOT_INFO,
+        playerID: RockN.Player.playerID,
+        totalBet: totalBet / this._owner.slotMenu.getBetLines() * this._owner.DEFINES.PAY_LINES
+    }, func..
+```
+
+> Response
+
+```json
+{
+    "protocol":112,
+    "code":200,
+    "betCash":10,
+    "info":[30,80,200,1000,10000]
+}
+```
+
+> Error Response
+
+```json
+{
+    "protocol":112,
+    "code":500
+}
+```
+
+### Sequence Diagram
+<div class="mermaid">
+    sequenceDiagram
+        participant C as Client
+        participant S as Server
+        participant D as DB
+        C ->>S: Jackpot Bonus Game Request
+        alt NormalMode
+            S ->>+D: Get progressive jackpotInfo
+            D -->>-S: Response
+        else currMode != NormalMode
+            S -->S: Get JackpotInfo from currJackpotInfo
+        end
+        S ->>C: json
+</div>
+
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1|protocol | int(112) | SIG_GET_SLOT_JACKPOT_INFO
+1|code | int(200) | 서버 OK 리스폰스 넘버
+1|betCash | int | 유저가 배팅한 금액
+1|info | int Array(5) | jackpotInfo - 노멀모드일 경우에는 실시간 갱신이나 노멀이 아닐 경우 서버에 저장된 currJackpotInfo(피쳐 진입시 저장)를 받음

@@ -1,0 +1,97 @@
+## FreeSpin
+
+> Request
+
+```javascript
+// Define Signal From parSheet
+var SIG.FREESPIN_GAME = this.parSheet.actions.freeSpinGame;
+
+// Signal Handler on Client side
+RockN.NET.request( 'connector.gameHandler.request', {
+        protocol: SIG.SIG_SLOT_CUSTOM_ACTION,
+        action: SIG.FREESPIN_GAME,
+        playerID: RockN.Player.playerID,
+    }, func..
+```
+
+> Response
+
+```json
+{
+    "protocol":120,
+    "action": 3,
+    "code":200,
+    "rands":[29,44,29,19,36],
+    "result":[
+        {"win":2,"matchSymbolID":[21,22,23],"name":"mixed","matchCount":3,"lineIndex":13}
+    ],
+    "eachWinResult":[
+        {"x":3,"y":1,"win":30,"name":"eachWin"}
+    ],
+    "currWin":32,
+    "winInfo":{
+        "isMajorWin":false,
+        "majorWinIndex":-1,
+        "multiple":0,
+        "lineMultiple":4
+    },
+    "freeSpinTotalWin":62,
+    "freeSpinCount":2,
+    "is2ndChance":true,
+    "isRefreshSpinCount":true,
+    "isJackpotBonusGame":true,
+    "DEBUG_GRID":[[12,22,23,71,71],[71,71,71,22,21],[11,21,12,71,71]]
+}
+```
+
+> Error Response
+
+```json
+{
+    "protocol":120,
+    "action":3,
+    "code":500
+}
+```
+
+
+### Sequence Diagram
+<div class="mermaid">
+    sequenceDiagram
+        participant C as Client
+        participant S as Server
+        C ->>S: FreeSpin Game Request
+        S -->>C: json(Response)
+</div>
+
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+1|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+1|action | int(3) | customAction 인덱스
+1|code | int(200) | 서버 OK 리스폰스 넘버
+1|rands | int(0-스트립길이) Array(5) | 랜드값
+1|result | object Array | 획득 결과 내용
+1|eachWinResult | object Array | eachWin 획득 결과 오브젝트
+1|eachWinResult.x | int(0-4) | eachWin 획득 심볼 x축 좌표
+1|eachWinResult.y | int(0-2) | eachWin 획득 심볼 y축 좌표
+1|eachWinResult.win | int(0-max) | eachWin 획득 심볼 win 금액
+1|eachWinResult.name | string | (ex. "eachWin")
+1|currWin | int(0-max) | 이번 스핀 획득금액
+1|freeSpinTotalWin | int(0-max) | 프리스핀 총 획득금액
+2.1|freeSpinCount | int(0-3) | 현재 남은 프리스핀 횟수
+1|is2ndChance | boolean | is2ndChance 팝업
+1|isRefreshSpinCount | boolean | 스핀 추가 여부
+1|isJackpotBonusGame | boolean | 잭팟 보너스 게임 진입 여부
+2.1|winInfo | object | 획득 정보에 대한 판정을 담은 객체
+2.1|winInfo.isMajorWin | boolean | 메이져 윈 여부
+2.1|winInfo.majorWinIndex | int(-1-4) | 메이져윈일 경우의 인덱스
+2.1|winInfo.multiple | int(0-max) | 당첨금액/총배팅액 결과
+2.1|winInfo.lineMultiple | int(0-max) | 당첨금액/라인배팅액 결과
+
+### Response Parameters in DEBUG
+
+Parameter | Default | Description
+--------- | ------- | -----------
+DEBUG_GRID | int Array(3x5) | 디버그용 랜드심볼아이디(row순)

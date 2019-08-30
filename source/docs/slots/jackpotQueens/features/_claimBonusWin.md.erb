@@ -1,0 +1,58 @@
+## Claim Bonus Win
+
+> Request
+
+```javascript
+// Define Signal From parSheet
+var SIG.CLAIM_BONUS_WIN = this.parSheet.actions.claimBonusGameWin;
+
+// Signal Handler on Client side
+RockN.NET.request( 'connector.gameHandler.request', {
+        protocol: SIG.SIG_SLOT_CUSTOM_ACTION,
+        action: SIG.CLAIM_BONUS_WIN,
+        playerID: RockN.Player.playerID,
+    }, func..
+```
+
+> Response
+
+```json
+{
+    "protocol":120,
+    "action":4,
+    "code":200,
+    "currJackpotInfo":[90,240,600,3000,30000],
+    "isFreeSpinMode":false,
+    "isBonusGame":true,
+    "openCellCount":3
+}
+```
+
+> Error Response
+
+```json
+{
+    "protocol":120,
+    "action":4,
+    "code":500
+}
+```
+
+### Sequence Diagram
+<div class="mermaid">
+    sequenceDiagram
+        participant C as Client
+        participant S as Server
+        C ->>S: claimBonusWin Request
+        S -->>C: json(Response)
+</div>
+
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+2.1|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+2.1|action | int(4) | customAction 인덱스
+2.1|code | int(200) | 서버 OK 리스폰스 넘버
+2.1|eachWin | int(0-max) | 획득한 EachWin 값
+2.1|freeSpinCount | int(0-3) | 현재 남은 프리스핀 횟수

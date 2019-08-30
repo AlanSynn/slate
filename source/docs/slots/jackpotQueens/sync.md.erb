@@ -1,0 +1,88 @@
+# Sync
+
+## FlowChart(Normal Spin)
+<div class="mermaid">
+graph TD
+    S[신규진입 초기화 상태 == no SyncParams] -->F1(Spin Request)
+    F1 --> R[onSpinResponse 수신 및 클라이언트 동작 완료 : 동기화 포인트1]
+    R --> B{onSpinResponse}
+    B -->|isJackpotBonusGame == true| F3>jackpotBonusGame 진입 및 팝업]
+    F3 --> F3-1(jackpotBonusGame Request)
+    F3-1 --> F3-2[jackpotBonusGameResponse 수신 및 클라이언트 동작 완료 : 동기화 포인트2]
+    F3-2 --> Q(ClaimJackpotBonusGameWin)
+    Q --> Q-A>claimJackpotBonusWin 팝업]
+    Q-A --> Q-AS[claimJackpotBonusWin 수신 및 클라이언트 동작 완료 : 동기화 포인트3]
+    Q-AS --> F2
+    B -->|isBonusGame == true| F2>BonusGame 진입 및 팝업]
+    F2 --> F2-1(BonusGame Request)
+    F2-1 --> F2-2[BonusGameResponse 수신 및 클라이언트 동작 완료 : 동기화 포인트4]
+    F2-2 --> Q2(ClaimBonusGameWin)
+    Q2 --> Q2-A>ClaimBonusGameWin 팝업]
+    Q2-A --> Q2-AS[ClaimBonusGameWin 수신 및 클라이언트 동작 완료 : 동기화 포인트5]
+    Q2-AS --> F4>프리스핀 진입 및 팝업]
+    F4 --> F4-R(프리스핀으로)
+
+    style R fill:#ED5752
+    style F2-2 fill:#ED5752
+    style Q-AS fill:#ED5752
+    style Q2-AS fill:#ED5752
+    style F3-2 fill:#ED5752
+    style F2-1 fill:#A9E2F3
+    style F1 fill:#A9E2F3
+    style F3-1 fill:#A9E2F3
+    style Q fill:#A9E2F3
+    style Q2 fill:#A9E2F3
+    style F4-R fill:#F39C12
+    style S fill:#F39C12
+</div>
+
+## FlowChart(FreeSpin)
+<div class="mermaid">
+graph TD
+    S(프리스핀으로)
+    S --> F4-R(프리스핀 Request)
+    F4-R --> F4-1[프리스핀Response 수신 : 동기화 포인트6]
+    F4-1 --> F4-Q{onFreeSpinResponse}
+
+    F4-Q --> |is2ndChance == true?| F4-2>프리스핀 2nd Chance 팝업]
+    F4-Q --> |else| F4-3
+    F4-Q --> |isJackpotBonus == true?| F5-1>프리스핀 중 JackpotBonusGame 진입 및 팝업]
+
+    subgraph JackpotBonusGameInFreeSpin
+    F5-1 --> F5-2(jackpotBonusGame Request)
+    F5-2 --> F5-2A[jackpotBonusGameResponse 수신 및 클라이언트 동작 완료 : 동기화 포인트7]
+    F5-2A --> F5-3(claimJackpotBonusWin)
+    F5-3 --> F5-4>claimJackpotBonusWin 팝업]
+    F5-4 --> F5-5[claimJackpotBonusWin 수신 및 클라이언트 동작 완료 : 동기화 포인트8]
+    end
+    F5-5 --> F4-R
+
+    F4-2 --> F4-3[프리스핀 클라이언트 동작 완료]
+    F4-3 --> F4-Q2>프리스핀 종료 팝업]
+    F4-Q2 --> F4-A[claimJackpotBonusWin 수신 및 클라이언트 동작 완료 : 동기화 포인트9]
+    F4-A --> F4-4(claimFreeSpinWin)
+    F4-4 --> E[피쳐 종료]
+
+
+    style F4-1 fill:#ED5752
+    style F5-2A fill:#ED5752
+    style F5-5 fill:#ED5752
+    style F4-A fill:#ED5752
+    style F5-2 fill:#A9E2F3
+    style F4-4 fill:#A9E2F3
+    style F4-R fill:#A9E2F3
+    style F5-3 fill:#A9E2F3
+    style S fill:#F39C12
+    style E fill:#F39C12
+</div>
+
+# Server mode state declarations
+ID | Code | Details
+--------- | --------- | -------
+NORMAL_MODE | 0 | 일반 스핀
+BONUS_GAME_MODE | 1 | 보너스 게임 모드
+JACKPOT_BONUS_GAME_MODE | 2 | 잭팟 보너스 게임 모드
+FREE_SPIN_MODE          | 3 | 프리스핀(오토스핀) 모드
+RESULT_MODE             | 4 | 피쳐 종료 전 팝업을 보지 않은 상태(종료 대기)
+BONUS_GAME_RESULT       | 5 | 보너스 게임 종료 후 프리스핀 팝업을 보지 않은 상태(보너스 게임 리스폰스 대기)
+JACKPOT_BONUS_RESULT    | 6 | 잭팟 보너스 게임의 잭팟 결과 팝업을 보지 않은 상태(잭팟 보너스 게임 리스폰스 대기)

@@ -1,0 +1,77 @@
+## Claim JackpotBonus Win
+
+> Request
+
+```javascript
+// Define Signal From parSheet
+var SIG.CLAIM_JACKPOT_BONUS_WIN = this.parSheet.actions.claimJackpotBonusGameWin;
+
+// Signal Handler on Client side
+RockN.NET.request( 'connector.gameHandler.request', {
+        protocol: SIG.SIG_SLOT_CUSTOM_ACTION,
+        action: SIG.CLAIM_JACKPOT_BONUS_WIN,
+        playerID: RockN.Player.playerID,
+    }, func..
+```
+
+> Response 1 프리스핀 모드가 아닐때
+
+```json
+{
+    "protocol":120,
+    "action":5,
+    "code":200,
+    "currJackpotInfo":[90,240,600,3000,30000],
+    "isFreeSpinMode":false,
+    "isBonusGame":true,
+    "openCellCount":3
+}
+```
+
+> Response 2 프리스핀 모드
+
+```json
+{
+    "protocol":120,
+    "action":5,
+    "code":200,
+    "currJackpotInfo":[90,240,600,3000,30000],
+    "isFreeSpinMode":false,
+    "isBonusGame":true,
+    "freeSpinCount":3,
+    "freeSpinTotalWin":100
+}
+```
+
+> Error Response
+
+```json
+{
+    "protocol":120,
+    "action":3,
+    "code":500
+}
+```
+
+### Sequence Diagram
+<div class="mermaid">
+    sequenceDiagram
+        participant C as Client
+        participant S as Server
+        C ->>S: claimJackpotBonusWin Request
+        S -->>C: json(Response)
+</div>
+
+### Response Parameters
+
+Rev | Parameter | Default | Description
+--------- | --------- | ------- | -----------
+2.1|protocol | int(120) | SIG_SLOT_CUSTOM_ACTION
+2.1|action | int(5) | customAction 인덱스
+2.1|code | int(200) | 서버 OK 리스폰스 넘버
+2.1|currJackpotInfo | int(기본 잭팟값-max) Array(5) | 갱신한 잭팟 정보
+2.1|isFreeSpinMode | boolean | 현재 프리스핀 모드인지 여부
+2.1|isBonusGame | boolean | 다음 스텝이 보너스 게임인지 여부(필요는 없으나 디버그용)
+2.1|openCellCount | int(0-3) | 열려야 하는 셀의 갯수 (즉, 3이면 잭팟 화면에서 총 5개의 가로 셀 중에 3개의 셀이 열려야함)
+2.1|freeSpinCount | int(0-3) | 현재 남은 프리스핀 횟수
+2.1|freeSpinTotalWin | int(0-max) | 프리스핀 총 획득금액
