@@ -36,6 +36,10 @@ console.log(document);
 }
 ```
 
+### README
++ [커스텀한 내역](docs/README)
++ [Slate](docs/Slate_README)
+
 ### Events
 + [Cross Word](docs/events/crossWordEvent)
 

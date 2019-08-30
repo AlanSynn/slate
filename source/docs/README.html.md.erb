@@ -1,0 +1,124 @@
+---
+title: ReadMe
+
+language_tabs: # must be one of https://git.io/vQNgJ
+  - json
+
+toc_footers:
+  - <a href='mailto:alansynn@flysher.net'>Documented by Alan Synn</a>
+  - Rev 1
+
+search: false
+print: false
+---
+
+# 커스텀 내역
+
+## [기능]LiveReload 추가 - bundler
+
+![liveReload](images/liveReload.gif)
+
+수정 후 저장하면 자동으로 갱신이 되도록 번들 추가
+
+[MiddleMan-LiveReload](https://github.com/middleman/middleman-livereload)
+
+## [기능]Nested 스트럭쳐 추가 - jackpotQueens 디렉토리 참조
+
+오른쪽과 같이 nested하게 스트럭쳐를 가져갈 수 있음
+변경사항들도 자유롭게 반영가능하므로 전략적인 문서화가 가능
+
+erb 는 middleman 의 렌더링 엔진에서 이해하는 분할 파일명이므로 erb를 권장함
+
+[MiddleMan](https://middlemanapp.com/)
+
+```
+.
+├── features
+│   ├── _bonusGame.md.erb
+│   ├── _claimBonusWin.md.erb
+│   ├── _claimFreeSpinWin.md.erb
+│   ├── _claimJackpotBonusWin.md.erb
+│   ├── features.md.erb
+│   ├── _freeSpinGame.md.erb
+│   ├── _getJackpotInfo.md.erb
+│   ├── _jackpotBonusGame.md.erb
+│   └── _spin.md.erb
+├── index.html.md.erb
+├── initialize.md.erb
+├── protocol.md.erb
+└── sync.md.erb
+```
+
+## [기능]Mermaid 라이브러리
+
+[Mermaid.js](https://mermaidjs.github.io/)
+
+![Mermaid](images/mermaid.png)
+도식형 라이브러리
+
+클래스 다이어그램 등을 자유롭게 사용가능 단 마크다운안에서 `<div>`태그로 세팅해야함
+
+### 예시 :
+
+```js
+<div class="mermaid">
+    classDiagram
+        Class01 <|-- AveryLongClass : Cool
+        Class03 *-- Class04
+        Class05 o-- Class06
+        Class07 .. Class08
+        Class09 --> C2 : Where am i?
+        Class09 --* C3
+        Class09 --|> Class07
+        Class07 : equals()
+        Class07 : Object[] elementData
+        Class01 : size()
+        Class01 : int chimp
+        Class01 : int gorilla
+        Class08 <--> C2: Cool label
+</div>
+```
+
+<div class="mermaid">
+    classDiagram
+        Class01 <|-- AveryLongClass : Cool
+        Class03 *-- Class04
+        Class05 o-- Class06
+        Class07 .. Class08
+        Class09 --> C2 : Where am i?
+        Class09 --* C3
+        Class09 --|> Class07
+        Class07 : equals()
+        Class07 : Object[] elementData
+        Class01 : size()
+        Class01 : int chimp
+        Class01 : int gorilla
+        Class08 <--> C2: Cool label
+</div>
+
+## [옵션]Search, Print
+  옵션에서 Search 바와 Print css 파일 적용 옵션을 선택할 수 있음
+
+`search: false`
+`print: false`
+
+위 두개로 조정 가능하며 예시는 오른쪽
+
+```yaml
+---
+title: Slot No.88 JackpotQueens Message Protocols
+
+language_tabs: # must be one of https://git.io/vQNgJ
+  - json
+
+toc_footers:
+  - <a href='mailto:alansynn@flysher.net'>Documented by Alan Synn</a>
+  - Rev 2.1
+
+includes:
+  - slot
+
+search: false
+print: false
+---
+```
